@@ -98,10 +98,19 @@
                 {
                     "name": "Use",
                     "type": "Button",
-                    "id": "37ac2902-e882-4e15-8b18-b987ed1aac79",
+                    "id": "455a24b0-60a1-40eb-8242-00c7222ff91d",
                     "expectedControlType": "",
                     "processors": "",
-                    "interactions": "",
+                    "interactions": "Press",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Swap",
+                    "type": "Button",
+                    "id": "9d98cf4b-71da-4056-a604-f58f5ecca504",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "Press",
                     "initialStateCheck": false
                 }
             ],
@@ -504,12 +513,23 @@
                 },
                 {
                     "name": "",
-                    "id": "b5d29317-eb5b-4c81-8fed-09a605d3dfff",
+                    "id": "aab92395-398c-4d90-8714-82a465568ca0",
                     "path": "<Keyboard>/f",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "Use",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "712a7cb7-1bae-4b65-8779-2b2e073bde85",
+                    "path": "<Keyboard>/r",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Swap",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

@@ -1,5 +1,4 @@
 using System.Collections;
-using NetworkHelperScripts;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -18,6 +17,12 @@ namespace PlayerScripts
         private FixedIntervalFloat _infection;
         private Coroutine _regenAfterDelayCoroutine;
         
+        public bool IsMonster { get; private set; }
+        
+        public float MaxHealth
+        {
+            get => maxHealth; 
+        }
         public float Health {
             get => _health.Value; 
             set => _health.Value = value;
@@ -51,7 +56,7 @@ namespace PlayerScripts
             }
             
             Health -= value;
-            GlobalDebugger.Instance.Log($"Player {NetworkManager.Singleton.LocalClientId} health changed: {Health}");
+            Debug.Log($"Player {NetworkManager.Singleton.LocalClientId} health changed: {Health}");
             CheckDead();
             
             _regenAfterDelayCoroutine = StartCoroutine(RegenAfterDelayCoroutine());
@@ -62,7 +67,7 @@ namespace PlayerScripts
             if (!IsOwner) return;
             
             Immunity -= value;
-            GlobalDebugger.Instance.Log($"Player {NetworkManager.Singleton.LocalClientId} immuniyu changed: {Health}");
+            Debug.Log($"Player {NetworkManager.Singleton.LocalClientId} immunity changed: {Immunity}");
             CheckInfected();
         }
 
@@ -71,22 +76,10 @@ namespace PlayerScripts
             if (!IsOwner) return;
             
             Infection += value;
-            GlobalDebugger.Instance.Log($"Player {NetworkManager.Singleton.LocalClientId} infection level changed: {Infection}");
+            Debug.Log($"Player {NetworkManager.Singleton.LocalClientId} infection level changed: {Infection}");
             CheckInfected();
         }
-        
-        private IEnumerator RegenAfterDelayCoroutine()
-        {
-            yield return new WaitForSeconds(regenDelay);
 
-            while (Health < 100f)
-            {
-                Health += regenValue;
-                GlobalDebugger.Instance.Log($"Player {NetworkManager.Singleton.LocalClientId} health changed: {Health}");
-                yield return new WaitForSeconds(regenTick);
-            }
-        }
-        
         private void CheckDead()
         {
             if (Health == 0f)
@@ -94,18 +87,35 @@ namespace PlayerScripts
                 Die();
             }
         }
-        
+        private IEnumerator RegenAfterDelayCoroutine()
+        {
+            yield return new WaitForSeconds(regenDelay);
+
+            while (Health < 100f)
+            {
+                Health += regenValue;
+                Debug.Log($"Player {NetworkManager.Singleton.LocalClientId} health changed: {Health}");
+                yield return new WaitForSeconds(regenTick);
+            }
+        }
+
         private void CheckInfected()
         {
             if (_infection.Value >= _immunity.Value)
             {
-                Die();
+                TurnToMonster();
             }
+        }
+        
+        private void TurnToMonster()
+        {
+            Debug.Log("Player is a monster now");
+            IsMonster = true;
         }
 
         private void Die()
         {
-            GlobalDebugger.Instance.Log("Player is dead");
+            Debug.Log("Player is dead");
         }
     }
 }

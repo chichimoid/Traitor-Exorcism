@@ -17,7 +17,7 @@ public class NetworkObjectSpawner : NetworkBehaviour
         SpawnGrabbableServerRpc(serializableSOList.grabbables.IndexOf(grabbableSO), position, rotation);
     }
 
-    [Rpc(SendTo.Server)]
+    [ServerRpc(RequireOwnership = false)]
     private void SpawnGrabbableServerRpc(int SOIndex, Vector3 position, Quaternion rotation)
     {
         GrabbableSO grabbableSO = serializableSOList.grabbables[SOIndex];

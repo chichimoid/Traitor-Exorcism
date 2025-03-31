@@ -11,6 +11,8 @@ public class FollowTransformManager : NetworkBehaviour
     private void Awake()
     {
         Instance = this;
+        
+        DontDestroyOnLoad(this);
     }
     
     public void Follow(Transform follower, Transform target)

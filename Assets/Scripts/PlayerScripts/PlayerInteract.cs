@@ -11,20 +11,26 @@ namespace PlayerScripts
         [Header("Configure")]
         [SerializeField] private float interactionRange = 3f;
         [Header("References")]
-        [SerializeField] private Transform holdPointTransform;
-    
+        [SerializeField] private Transform holdPointTransformMain;
+        [SerializeField] private Transform holdPointTransformSecond;
+
+
         private NetworkPlayer _networkPlayer;
         private PlayerInputActions _inputActions;
         private InputAction _interact;
         private InputAction _drop;
+        private InputAction _swap;
         private PlayerRayCaster _rayCaster;
         
+        public NetworkPlayer NetworkPlayer => _networkPlayer;
         public float InteractionRange => interactionRange;
-        public Transform HoldPointTransform => holdPointTransform;
+        public Transform HoldPointTransformMain => holdPointTransformMain;
+        public Transform HoldPointTransformSecond => holdPointTransformSecond;
+
 
         private void Start()
         {
-            if (!IsOwner) return;
+            if (!IsOwner) return;  
             
             _networkPlayer = GetComponent<NetworkPlayer>();
             _inputActions = GetComponent<InputActionsContainer>().InputActions;
@@ -32,16 +38,17 @@ namespace PlayerScripts
             
             _interact = _inputActions.Player.Interact;
             _drop = _inputActions.Player.Drop;
+            _swap = _inputActions.Player.Swap;
             
             OnEnable();
         }
-        
         private void OnEnable()
         {
             if (!IsOwner || !didStart) return;
             
             _interact.performed += Interact;
             _drop.performed += Drop;
+            _swap.performed += Swap;
         }
 
         private void OnDisable()
@@ -50,6 +57,7 @@ namespace PlayerScripts
             
             _interact.performed -= Interact;
             _drop.performed -= Drop;
+            _swap.performed -= Swap;
         }
     
         private void Interact(InputAction.CallbackContext context)
@@ -61,13 +69,23 @@ namespace PlayerScripts
                 {
                     if (interactable is IGrabbable grabbable)
                     {
-                        if (_networkPlayer.HeldObj != null)
+                        if (_networkPlayer.HeldObjMain is not null && _networkPlayer.HeldObjSecond is not null)
                         {
                             Debug.Log("Hands full");
                             return;
                         }
-                        grabbable.Interact(transform);
-                        _networkPlayer.HeldObj = grabbable;
+                        if (_networkPlayer.HeldObjMain is not null && _networkPlayer.HeldObjSecond is null)
+                        {
+                            _networkPlayer.HeldObjSecond = grabbable;
+                            grabbable.Interact(transform);
+                            
+                        }
+                        if (_networkPlayer.HeldObjMain is null)
+                        {
+                            _networkPlayer.HeldObjMain = grabbable;
+                            grabbable.Interact(transform);
+                        }
+
                     }
                     else
                     {
@@ -76,13 +94,29 @@ namespace PlayerScripts
                 }
             }
         }
-
+        private void Swap(InputAction.CallbackContext context)
+        {
+            if (_networkPlayer.HeldObjMain is null || _networkPlayer.HeldObjSecond is null) return;
+            var firstCoords = holdPointTransformMain.position;
+            var firstRotation = holdPointTransformMain.rotation;
+            holdPointTransformMain.SetPositionAndRotation(holdPointTransformSecond.position, holdPointTransformSecond.rotation);
+            holdPointTransformSecond.SetPositionAndRotation(firstCoords, firstRotation);
+            var temp = _networkPlayer.HeldObjMain;
+            _networkPlayer.HeldObjMain = _networkPlayer.HeldObjSecond;
+            _networkPlayer.HeldObjSecond = temp;
+        }
         private void Drop(InputAction.CallbackContext context)
         {
-            Debug.Log("Drop");
-            
-            _networkPlayer.HeldObj?.Drop();
-            _networkPlayer.HeldObj = null;
+            _networkPlayer.HeldObjMain?.Drop();
+            if(_networkPlayer.HeldObjSecond is not null)
+            {
+                _networkPlayer.HeldObjSecond?.Drop();
+                _networkPlayer.HeldObjSecond = null;
+
+                //FollowTransformManager.Instance.Unfollow(_networkPlayer.HeldObjSecond.ReturnTransform());
+                //FollowTransformManager.Instance.Follow(_networkPlayer.HeldObjSecond.ReturnTransform(), holdPointTransformMain);
+            }
+            _networkPlayer.HeldObjMain = null;
         }
     }
 }

@@ -11,7 +11,8 @@ namespace ObjectScripts
         private Rigidbody _objectRigidbody;
         private Collider _objectCollider;
         private bool _canInteract = true;
-    
+        public Transform player; // хз как сделать так чтобы оно не было в настройках скрипта но при этом было у всех наследников
+
         private void Awake()
         {
             _objectRigidbody = GetComponent<Rigidbody>();
@@ -22,14 +23,17 @@ namespace ObjectScripts
         {
             return _canInteract;
         }
-        
         public void Interact(Transform interactor)
         {
             GrabbableSetFollowTransformServerRpc(interactor.GetComponent<NetworkObject>());
+            player = interactor;
+            // Functional();
         }
+
+        // protected abstract void Functional();
         
         [ServerRpc(RequireOwnership = false)]
-        private void GrabbableSetFollowTransformServerRpc(NetworkObjectReference parentReference)
+        public void GrabbableSetFollowTransformServerRpc(NetworkObjectReference parentReference)
         {
             GrabbableSetFollowTransformClientRpc(parentReference);
         }
@@ -42,14 +46,18 @@ namespace ObjectScripts
             _objectCollider.isTrigger = true;
         
             parentReference.TryGet(out NetworkObject parent);
-            FollowTransformManager.Instance.Follow(transform, parent.GetComponent<PlayerInteract>().HoldPointTransform);
+            if(parent.GetComponent<PlayerInteract>().NetworkPlayer.HeldObjSecond is not null)
+            {
+                FollowTransformManager.Instance.Follow(transform, parent.GetComponent<PlayerInteract>().HoldPointTransformSecond);
+                return;
+            }
+            FollowTransformManager.Instance.Follow(transform, parent.GetComponent<PlayerInteract>().HoldPointTransformMain);
         }
 
         public void Drop()
         {
             DropServerRpc();
         }
-        
         [ServerRpc(RequireOwnership = false)]
         private void DropServerRpc()
         {
@@ -61,7 +69,7 @@ namespace ObjectScripts
         {
             _objectRigidbody.isKinematic = false;
             _objectCollider.isTrigger = false;
-            
+
             FollowTransformManager.Instance.Unfollow(transform);
             _canInteract = true;
         }

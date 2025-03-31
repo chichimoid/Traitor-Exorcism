@@ -15,8 +15,7 @@ public class SceneLoader : NetworkBehaviour
     {
         MainMenu,
         Lobby,
-        Maze,
-        Voting
+        Maze
     }
 
     public void LoadSceneLocal(Scene scene)

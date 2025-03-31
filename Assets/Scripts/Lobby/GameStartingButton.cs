@@ -1,5 +1,4 @@
-﻿using Maze;
-using ObjectScripts;
+﻿using ObjectScripts;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -17,13 +16,12 @@ namespace Lobby
         
         public void Interact(Transform player)
         {
-            if (!IsServer)
+            if (!IsHost)
             {
-                _textHelper.TempDisplayText32Chars(clientAttemptMsg);
+                _textHelper.TempDisplayText128Chars(clientAttemptMsg);
                 return;
             }
-            
-            GameManager.Instance.StartGame();
+            SceneLoader.Instance.LoadSceneGlobal(SceneLoader.Scene.Maze);
         }
     }
 }

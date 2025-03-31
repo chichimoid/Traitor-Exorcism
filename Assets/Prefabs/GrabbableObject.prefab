@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 298055382604370109}
   - component: {fileID: 2442503562106140379}
   - component: {fileID: 7960624818148078674}
-  - component: {fileID: 6776396093240544515}
+  - component: {fileID: 1346187576918300408}
   m_Layer: 0
   m_Name: GrabbableObject
   m_TagString: Grabbable
@@ -200,7 +200,7 @@ MonoBehaviour:
   SwitchTransformSpaceWhenParented: 0
   Interpolate: 1
   SlerpPosition: 0
---- !u!114 &6776396093240544515
+--- !u!114 &1346187576918300408
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -209,7 +209,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 8691486161905055283}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4a4234eb3613432fba912bd2e8e4b5db, type: 3}
+  m_Script: {fileID: 11500000, guid: 61b83e419062431ca605ac532d2e5a1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1

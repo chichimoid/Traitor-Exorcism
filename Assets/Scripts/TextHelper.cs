@@ -10,7 +10,7 @@ public class TextHelper : NetworkBehaviour
     private string _prevText;
     private Coroutine _hideTextCoroutine;
         
-    public void TempDisplayText32Chars(string text, float duration = 1f)
+    public void TempDisplayText128Chars(string text, float duration = 1f)
     {
         TempDisplayText128ServerRpc((FixedString64Bytes)text, duration);
     }

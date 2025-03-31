@@ -49,9 +49,9 @@ namespace PlayerScripts
             
             if (_rayCaster.ViewPointRayCast(out RaycastHit hit,  meleeAttackRange)) 
             {
-                if (hit.collider.TryGetComponent(out NetworkPlayer otherPlayer) && otherPlayer.State == PlayerState.InMaze)
+                if (hit.collider.TryGetComponent(out NetworkPlayer otherPlayer) && otherPlayer.State == PlayerState.Survivor)
                 {
-                    var heldObj = _networkPlayer.HeldObj;
+                    var heldObj = _networkPlayer.HeldObjMain;
                     
                     AttackServerRpc(new NetworkObjectReference(otherPlayer.gameObject), (heldObj as Weapon)?.Damage ?? bareHandDamage);
                 }
@@ -71,7 +71,7 @@ namespace PlayerScripts
             var attackedNetworkPlayer = attackedPlayer.GetComponent<NetworkPlayer>();
             var attackedPlayerHealth = attackedPlayer.GetComponent<PlayerHealth>();
             
-            if (NetworkManager.Singleton.LocalClientId == attackedNetworkPlayer.Id) attackedPlayerHealth.DamageHealth(damage);
+            if (NetworkManager.Singleton.LocalClientId == attackedNetworkPlayer.PlayerId) attackedPlayerHealth.DamageHealth(damage);
         }
     }
 }

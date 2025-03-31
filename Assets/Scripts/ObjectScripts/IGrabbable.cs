@@ -1,4 +1,6 @@
-﻿namespace ObjectScripts
+﻿using UnityEngine;
+
+namespace ObjectScripts
 {
     public interface IGrabbable : IInteractable
     {

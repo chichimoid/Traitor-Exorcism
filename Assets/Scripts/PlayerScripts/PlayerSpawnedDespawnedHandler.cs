@@ -1,9 +1,7 @@
-﻿using Maze;
-using NetworkHelperScripts;
+﻿using NetworkHelperScripts;
 using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
-using Voting;
 using Cursor = UnityEngine.Cursor;
 
 namespace PlayerScripts
@@ -29,8 +27,6 @@ namespace PlayerScripts
             
             if (!IsOwner) return;
             
-            Debug.Log($"Spawned player (id: {NetworkManager.Singleton.LocalClientId})");
-            
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;
             
@@ -54,10 +50,8 @@ namespace PlayerScripts
             Cursor.visible = true;
             Cursor.lockState = CursorLockMode.None;
             
-            Destroy(PlayerCamera.Instance?.gameObject);
-            Destroy(SessionManager.Instance?.gameObject);
-            Destroy(GameManager.Instance?.gameObject);
-            
+            Destroy(PlayerCamera.Instance.gameObject);
+            Destroy(SessionManager.Instance.gameObject);
             SceneLoader.Instance.LoadSceneLocal(SceneLoader.Scene.MainMenu);
         }
 
@@ -81,7 +75,7 @@ namespace PlayerScripts
                 // This is very ugly due to proper emotes being absent.
                 // This is only a template for an actual emote system, where emotes are just text signs.
                 var text = emoteButton.EmoteName;
-                emoteButton.Button.onClick.AddListener(() => helper.TempDisplayText32Chars(text));
+                emoteButton.Button.onClick.AddListener(() => helper.TempDisplayText128Chars(text));
             }
             
             PlayerUI.Instance.DisableConditionalUI();

@@ -35,7 +35,7 @@ namespace Maze
         {
             base.OnNetworkSpawn();
             
-            if (IsServer)
+            if (NetworkManager.Singleton.IsHost)
             {
                 CreateMaze();
             }
