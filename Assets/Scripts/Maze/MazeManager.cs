@@ -19,11 +19,13 @@ namespace Maze
         }
         public void CreateMaze()
         {
-            _maze.Value = new Maze(width, length);
+            _maze.Value = new global::Maze.Maze(width, length);
             var generator = new MazeGenerator();
             var mazeValue = _maze.Value;
             mazeValue.Cells = generator.GenerateMaze(width, length);
             _maze.Value = mazeValue;
+        
+            // JoinMaze();
         }
 
         public void JoinMaze()
@@ -34,8 +36,8 @@ namespace Maze
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
-            
-            if (IsServer)
+
+            if (NetworkManager.Singleton.IsHost)
             {
                 CreateMaze();
             }
