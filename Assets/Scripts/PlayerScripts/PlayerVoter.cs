@@ -9,10 +9,10 @@ namespace Voting
     public class PlayerVoter : MonoBehaviour
     {
         [Header("Configure")]
-        [SerializeField] private float votingRange;
+        [SerializeField] private float votingRange = 12;
         
         private PlayerRayCaster _rayCaster;
-        private NetworkPlayer _currentVotePlayer;
+        private NetworkPlayer _currentVotePlayer = null;
 
         private void Start()
         {
@@ -32,11 +32,15 @@ namespace Voting
             {
                 if (hit.collider.TryGetComponent(out NetworkPlayer otherPlayer) && otherPlayer.State == PlayerState.InVoting)
                 {
-                    if (_currentVotePlayer.Id == otherPlayer.Id) return;
-                    
-                    _currentVotePlayer.GetComponent<VoteCount>().UnVoteThis();
+                    if (_currentVotePlayer != null && _currentVotePlayer.Id == otherPlayer.Id) return;
+                    //Debug.Log("pidorasi");
+                    VoteManager.Instance.UnVote(_currentVotePlayer.Id);
                     _currentVotePlayer= otherPlayer;
-                    otherPlayer.GetComponent<VoteCount>().VoteThis();
+                    VoteManager.Instance.Vote(otherPlayer.Id);
+                }
+                else
+                {
+                    _currentVotePlayer = null;
                 }
             }
         }

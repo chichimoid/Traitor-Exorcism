@@ -44,6 +44,7 @@ public struct MazeGeneratorCell : INetworkSerializable
         serializer.SerializeValue(ref wallLeft);
         serializer.SerializeValue(ref visited);
         serializer.SerializeValue(ref roomNumber);
+        serializer.SerializeValue(ref zone);
     }
 }
 

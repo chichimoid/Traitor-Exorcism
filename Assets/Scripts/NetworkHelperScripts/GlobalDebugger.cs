@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class GlobalDebugger : NetworkBehaviour
 {
-    public static GlobalDebugger Instance;
+    public static GlobalDebugger Instance { get; private set; }
 
     private void Awake()
     {

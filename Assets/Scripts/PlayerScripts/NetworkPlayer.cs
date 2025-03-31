@@ -25,7 +25,7 @@ namespace PlayerScripts
         
         private readonly NetworkVariable<ulong> _id = new(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         private readonly NetworkVariable<PlayerState> _state = new(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-        private readonly NetworkVariable<PlayerRole> _role = new(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+        private readonly NetworkVariable<PlayerRole> _role = new(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
         public GameObject MeshObject => meshObject;
         public ulong Id { get => _id.Value; private set => _id.Value = value; }

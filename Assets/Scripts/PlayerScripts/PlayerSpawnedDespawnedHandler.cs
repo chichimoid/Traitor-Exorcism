@@ -37,6 +37,7 @@ namespace PlayerScripts
             AddPlayerCamera();
             AddPlayerUI();
             transform.AddComponent<PlayerLocker>();
+            transform.AddComponent<PlayerVoter>();
             transform.AddComponent<CrosshairUIManager>();
             
             if (IsServer)

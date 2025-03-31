@@ -6,7 +6,8 @@ namespace PlayerScripts
     {
         private PlayerMovement _playerMovement;
         private PlayerRotation _playerRotation;
-        public static PlayerLocker Instance;
+        private Rigidbody _rigidbody;
+        public static PlayerLocker Instance { get; private set; }
 
         private void Awake()
         {
@@ -17,6 +18,7 @@ namespace PlayerScripts
         {
             _playerMovement = GetComponent<PlayerMovement>();
             _playerRotation = GetComponent<PlayerRotation>();
+            _rigidbody = GetComponent<Rigidbody>();
         }
         
         public void LockCursor()
@@ -39,6 +41,16 @@ namespace PlayerScripts
         public void UnlockMovement()
         {
             _playerMovement.CanMove = true;
+        }
+
+        public void LockPhysics()
+        {
+            _rigidbody.isKinematic = true;
+        }
+
+        public void UnlockPhysics()
+        {
+            _rigidbody.isKinematic = false;
         }
     }
 }

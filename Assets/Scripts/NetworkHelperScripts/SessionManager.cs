@@ -7,24 +7,10 @@ namespace NetworkHelperScripts
     {
         [SerializeField] private Transform gameManagerPrefab;
         
-        public static SessionManager Instance;
+        public static SessionManager Instance { get; private set; }
         private void Awake()
         {
             Instance = this;
-            
-            DontDestroyOnLoad(this.gameObject);
-        }
-
-        private void Start()
-        {
-            if (!IsServer)
-            {
-                Debug.Log("it worked");
-
-                Transform spawnedObject = Instantiate(gameManagerPrefab);
-                NetworkObject spawnedNetworkObject = spawnedObject.GetComponent<NetworkObject>();
-                spawnedNetworkObject.Spawn(false);
-            }
         }
         
         public void LeaveSession()

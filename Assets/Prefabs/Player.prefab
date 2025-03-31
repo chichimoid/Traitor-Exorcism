@@ -244,7 +244,6 @@ GameObject:
   - component: {fileID: 5078071764432592721}
   - component: {fileID: 3746074126065957678}
   - component: {fileID: 4336482414689770037}
-  - component: {fileID: 5193442220226725831}
   - component: {fileID: 2062729248973738123}
   - component: {fileID: 3036088138234217332}
   m_Layer: 0
@@ -335,7 +334,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1077974469
+  GlobalObjectIdHash: 1564670984
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -567,20 +566,6 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   meleeAttackRange: 3
   bareHandDamage: 10
---- !u!114 &5193442220226725831
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1335080514779221509}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 57e2c593571f472dbb7d08c114491123, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ShowTopMostFoldoutHeaderGroup: 1
-  votingRange: 8
 --- !u!114 &2062729248973738123
 MonoBehaviour:
   m_ObjectHideFlags: 0

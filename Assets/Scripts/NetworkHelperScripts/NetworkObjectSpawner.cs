@@ -20,9 +20,9 @@ public class NetworkObjectSpawner : NetworkBehaviour
     [Rpc(SendTo.Server)]
     private void SpawnGrabbableServerRpc(int SOIndex, Vector3 position, Quaternion rotation)
     {
-        GrabbableSO grabbableSO = serializableSOList.grabbables[SOIndex];
-        Transform spawnedObject = Instantiate(grabbableSO.prefab, position, rotation);
-        NetworkObject spawnedNetworkObject = spawnedObject.GetComponent<NetworkObject>();
+        var grabbableSO = serializableSOList.grabbables[SOIndex];
+        var spawnedObject = Instantiate(grabbableSO.prefab, position, rotation);
+        var spawnedNetworkObject = spawnedObject.GetComponent<NetworkObject>();
         spawnedNetworkObject.Spawn(true);
     }
 }

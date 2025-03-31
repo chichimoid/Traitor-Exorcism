@@ -6,7 +6,7 @@ public class FollowTransformManager : NetworkBehaviour
 {
     private readonly Dictionary<Transform, Transform> _followersTargets = new();
     
-    public static FollowTransformManager Instance;
+    public static FollowTransformManager Instance { get; private set; }
     
     private void Awake()
     {

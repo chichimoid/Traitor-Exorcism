@@ -20,32 +20,16 @@ namespace PlayerScripts
         
         private void HandleInVoting()
         {
-            HandleInVotingServerRpc(NetworkManager.Singleton.LocalClient.PlayerObject);
-        }
+            GetComponent<PlayerVoter>().enabled = true;
 
-        [ServerRpc(RequireOwnership = false)]
-        private void HandleInVotingServerRpc(NetworkObjectReference playerReference)
-        {
-            playerReference.TryGet(out var playerObject);
-
-            playerObject.GetComponent<PlayerVoter>().enabled = true;
-
-            playerObject.GetComponent<PlayerLocker>().LockMovement();
+            PlayerLocker.Instance.LockMovement();
         }
         
         private void HandleFromInVoting()
         {
-            HandleFromInVotingServerRpc(gameObject);
-        }
-
-        [ServerRpc(RequireOwnership = false)]
-        private void HandleFromInVotingServerRpc(NetworkObjectReference playerReference)
-        {
-            playerReference.TryGet(out var playerObject);
+            GetComponent<PlayerVoter>().enabled = false;
             
-            playerObject.GetComponent<PlayerVoter>().enabled = false;
-            
-            playerObject.GetComponent<PlayerLocker>().UnlockMovement();
+            PlayerLocker.Instance.UnlockMovement();
         }
     }
 }

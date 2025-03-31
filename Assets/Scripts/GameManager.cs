@@ -12,25 +12,11 @@ namespace Maze
 {
     public class GameManager : NetworkBehaviour
     {
-        [Header("Voting Configure")] 
-        [SerializeField] private Vector2 votingCircleCenter;
-        [SerializeField] private float votingCircleRadius;
-        
-        public static GameManager Instance;
+        public static GameManager Instance { get; private set; }
 
         private void Awake()
         {
             Instance = this;
-            
-            DontDestroyOnLoad(this.gameObject);
-        }
-
-        private void ChangeStates(PlayerState state)
-        {
-            foreach (var client in NetworkManager.Singleton.ConnectedClientsList)
-            {
-                client.PlayerObject.GetComponent<NetworkPlayer>().State = state;
-            }
         }
         
         private void GiveRoles()
@@ -39,17 +25,23 @@ namespace Maze
             
             var monsterIdIndex = Random.Range(0, NetworkManager.Singleton.ConnectedClientsList.Count);
             var monsterId = NetworkManager.Singleton.ConnectedClientsIds[monsterIdIndex];
-
-            foreach (var (clientId, client) in NetworkManager.Singleton.ConnectedClients)
-            {
-                if (clientId == monsterId)
-                {
-                    var networkPlayer = client.PlayerObject.GetComponent<NetworkPlayer>();
-                    networkPlayer.Role = PlayerRole.Monster;
-                    
-                    GlobalDebugger.Instance.Log($"Player {clientId} is the monster.");
-                }
-            }
+            
+            GiveRolesRpc(monsterId);
+            
+            GlobalDebugger.Instance.Log($"Player {monsterId} is the monster.");
+        }
+        
+        [Rpc(SendTo.Everyone)]
+        private void GiveRolesRpc(ulong monsterId)
+        {
+            var networkPlayer = NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<NetworkPlayer>();
+            networkPlayer.Role = networkPlayer.Id == monsterId ? PlayerRole.Monster : PlayerRole.Survivor;
+        }
+        
+        [Rpc(SendTo.Everyone)]
+        private void ChangeStatesRpc(PlayerState state)
+        {
+            NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<NetworkPlayer>().State = state;
         }
         
         public void StartGame()
@@ -60,7 +52,7 @@ namespace Maze
             
             SceneLoader.Instance.LoadSceneGlobal(SceneLoader.Scene.Maze);
             
-            ChangeStates(PlayerState.InMaze);
+            ChangeStatesRpc(PlayerState.InMaze);
             GiveRoles();
             StartRound();
         }
@@ -74,60 +66,35 @@ namespace Maze
         
         public void StartVoting()
         {
-            StartVotingServerRpc();
+            ChangeStatesRpc(PlayerState.InVoting);
+            SceneLoader.Instance.LoadSceneGlobal(SceneLoader.Scene.Voting);
         }
         
-        [ServerRpc(RequireOwnership = false)]
-        private void StartVotingServerRpc()
-        {
-            SceneLoader.Instance.LoadSceneGlobal(SceneLoader.Scene.Voting);
-            
-            ChangeStates(PlayerState.InVoting);
-            
-            var len = NetworkManager.Singleton.ConnectedClients.Count;
-            for (int i = 0; i < len; i++)
-            {
-                var playerTransform = NetworkManager.Singleton.ConnectedClientsList[i].PlayerObject.gameObject.transform;
-                playerTransform.position = new Vector3(
-                    votingCircleCenter.x + (float)Math.Sin(Math.PI * 2 * i / len) * votingCircleRadius,
-                    playerTransform.position.y,
-                    votingCircleCenter.y + (float)Math.Cos(Math.PI * 2 * i / len) * votingCircleRadius);
-                playerTransform.LookAt(new Vector3(votingCircleCenter.x, playerTransform.position.y, votingCircleCenter.y));
-            }
-        }
-
         private void EndVoting()
         {
             if (!IsServer) return;
 
-            NetworkPlayer maxVotesPlayer = null;
             int maxVotes = 0;
-            
-            foreach (var (clientId, client) in NetworkManager.Singleton.ConnectedClients)
+            bool doKickPlayer = false;
+            foreach (var voteCount in VoteManager.Instance.Votes)
             {
-                var networkPlayer = client.PlayerObject.GetComponent<NetworkPlayer>();
-
-                var votes = networkPlayer.GetComponent<VoteCount>().Votes;
-                
-                if (votes > maxVotes)
+                if (voteCount > maxVotes)
                 {
-                    maxVotes = votes;
-                    maxVotesPlayer = networkPlayer;
+                    maxVotes = voteCount;
+                    doKickPlayer = true;
                 }
-                else if (votes == maxVotes)
+                else if (voteCount == maxVotes)
                 {
-                    maxVotesPlayer = null;
+                    doKickPlayer = false;
                 }
             }
-            
-            if (maxVotesPlayer != null) Kick(maxVotesPlayer);
-        }
 
-        public void Kick(NetworkPlayer player)
-        {
-            if (!IsServer) return;
-            
-            SessionManager.Instance.KickPlayer(player.Id);
+            if (doKickPlayer)
+            {
+                var index = VoteManager.Instance.Votes.IndexOf(maxVotes);
+                var maxVotesPlayerId = NetworkManager.Singleton.ConnectedClientsIds[index];
+                SessionManager.Instance.KickPlayer(maxVotesPlayerId);
+            }
         }
     }
 }
