@@ -1,7 +1,9 @@
 using System.Collections.Generic;
+using Unity.Services.Authentication;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
+using static Unity.Cinemachine.CinemachineSplineRoll;
 
 namespace Maze
 {
@@ -39,6 +41,8 @@ namespace Maze
                     Cell cell = Instantiate(cellSO.prefab, 
                         new Vector3(i * cellSize.x + xOffset, j * cellSize.y + yOffset, j * cellSize.z + zOffset), 
                         Quaternion.identity).GetComponent<Cell>();
+                    SpawnBorderWalls(cell, i, j, cells.GetLength(0), cells.GetLength(1));
+
                     cell.wallLeft.SetActive(cells[i, j].wallLeft);
                     cell.wallBottom.SetActive(cells[i, j].wallBottom);
 
@@ -97,9 +101,20 @@ namespace Maze
             if (wallSlot.childCount > 0)
                 Destroy(wallSlot.GetChild(0).gameObject);
 
-            Instantiate(wallObject, wallSlot);
+            GameObject spawnedObj = Instantiate(wallObject, wallSlot);
+            ApplyRandomTransform(spawnedObj.transform);
             AdjustPrefabScale(wallObject);
             SnapToGroundWithRaycast(wallObject);
+        }
+
+        private void ApplyRandomTransform(Transform targetTransform)
+        {
+            float randomYRotation = Random.Range(-30f, 30f);
+            targetTransform.Rotate(0f, randomYRotation, 0f, Space.Self);
+
+            float randomXOffset = Random.Range(-1f, 1f);
+            float randomZOffset = Random.Range(-1f, 1f);
+            targetTransform.Translate(randomXOffset, 0f, randomZOffset, Space.Self);
         }
 
         private void SpawnObjectsOnWall(GameObject wallHolder, string objectName)
@@ -124,8 +139,30 @@ namespace Maze
             {
                 return;
             }
-
             Instantiate(wallObject, wallSlot);
+        }
+
+        private void SpawnBorderWalls(Cell cell, int i, int j, int width, int height)
+        {
+            if (i == width - 1 && cell.wallLeft != null)
+            {
+                GameObject rightWall = Instantiate(cell.wallLeft, cell.transform);
+                rightWall.transform.localPosition = new Vector3(-cell.wallLeft.transform.localPosition.x,
+                                                             cell.wallLeft.transform.localPosition.y,
+                                                             cell.wallLeft.transform.localPosition.z);
+                rightWall.transform.localRotation = Quaternion.Euler(0, 90, 0);
+                rightWall.SetActive(true);
+            }
+
+            if (j == height - 1 && cell.wallBottom != null)
+            {
+                GameObject topWall = Instantiate(cell.wallBottom, cell.transform);
+                topWall.transform.localPosition = new Vector3(cell.wallBottom.transform.localPosition.x,
+                                                            cell.wallBottom.transform.localPosition.y,
+                                                            -cell.wallBottom.transform.localPosition.z);
+                topWall.transform.localRotation = Quaternion.Euler(0, 180, 0);
+                topWall.SetActive(true);
+            }
         }
 
         GameObject GetRandomPrefab(List<WeightedPrefab> weightedPrefabs)
@@ -146,7 +183,7 @@ namespace Maze
             return weightedPrefabs[0].prefab;
         }
 
-        private void AdjustPrefabScale(GameObject prefabInstance, float minSize = 1.0f)
+        private void AdjustPrefabScale(GameObject prefabInstance, float minSize = 0.84f)
         {
             Renderer rend = prefabInstance.GetComponent<Renderer>();
             if (rend == null)
