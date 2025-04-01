@@ -8,8 +8,10 @@ namespace Voting
     public class VoteDisplayer : NetworkBehaviour
     {
         [SerializeField] private TMP_Text textField;
-        public ulong BoundId { get; set; }
-
+        
+        private readonly NetworkVariable<ulong> _boundId = new();
+        
+        public ulong BoundId { get => _boundId.Value; set => _boundId.Value = value; }
         public int Votes { get; private set; } = 0;
 
         private void Start()
@@ -24,30 +26,16 @@ namespace Voting
         {
             if (BoundId == id)
             {
-                VoteRpc(gameObject);
+                textField.text = (++Votes).ToString();
             }
-        }
-
-        [Rpc(SendTo.Everyone)]
-        private void VoteRpc(NetworkObjectReference voteCounterReference)
-        {
-            voteCounterReference.TryGet(out var voteCounterObject);
-            voteCounterObject.GetComponent<VoteDisplayer>().textField.text = (++Votes).ToString();
         }
 
         public void UnVote(ulong id)
         {
             if (BoundId == id)
             {
-                VoteRpc(gameObject);
+                textField.text = (--Votes).ToString();
             }
-        }
-
-        [Rpc(SendTo.Everyone)]
-        private void UnVoteRpc(NetworkObjectReference voteCounterReference)
-        {
-            voteCounterReference.TryGet(out var voteCounterObject);
-            voteCounterObject.GetComponent<VoteDisplayer>().textField.text = (--Votes).ToString();
         }
     }
 }

@@ -20,7 +20,7 @@ public class FollowTransformManager : NetworkBehaviour
     
     public void Unfollow(Transform follower)
     {
-        _followersTargets.Remove(follower);
+        _followersTargets.Remove(follower.transform);
     }
 
     private void LateUpdate()

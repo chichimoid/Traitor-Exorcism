@@ -25,44 +25,34 @@ namespace ObjectScripts
         
         public void Interact(Transform interactor)
         {
-            GrabbableSetFollowTransformServerRpc(interactor.GetComponent<NetworkObject>());
-        }
-        
-        [ServerRpc(RequireOwnership = false)]
-        private void GrabbableSetFollowTransformServerRpc(NetworkObjectReference parentReference)
-        {
-            GrabbableSetFollowTransformClientRpc(parentReference);
+            GrabbableSetFollowTransformRpc(interactor.GetComponent<NetworkObject>());
         }
 
-        [ClientRpc]
-        private void GrabbableSetFollowTransformClientRpc(NetworkObjectReference parentReference)
+        [Rpc(SendTo.Everyone)]
+        private void GrabbableSetFollowTransformRpc(NetworkObjectReference parentReference)
         {
             _canInteract = false;
+            
             _objectRigidbody.isKinematic = true;
             _objectCollider.isTrigger = true;
-        
-            parentReference.TryGet(out NetworkObject parent);
+            
+            parentReference.TryGet(out var parent);
             FollowTransformManager.Instance.Follow(transform, parent.GetComponent<PlayerInteract>().HoldPointTransform);
         }
 
         public void Drop()
         {
-            DropServerRpc();
+            DropRpc();
         }
         
-        [ServerRpc(RequireOwnership = false)]
-        private void DropServerRpc()
+        [Rpc(SendTo.Everyone)]
+        private void DropRpc()
         {
-            DropClientRpc();
-        }
-
-        [ClientRpc]
-        private void DropClientRpc()
-        {
+            FollowTransformManager.Instance.Unfollow(transform);
+            
             _objectRigidbody.isKinematic = false;
             _objectCollider.isTrigger = false;
             
-            FollowTransformManager.Instance.Unfollow(transform);
             _canInteract = true;
         }
     }

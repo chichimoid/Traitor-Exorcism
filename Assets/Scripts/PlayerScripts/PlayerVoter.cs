@@ -12,7 +12,8 @@ namespace Voting
         [SerializeField] private float votingRange = 12;
         
         private PlayerRayCaster _rayCaster;
-        private NetworkPlayer _currentVotePlayer = null;
+        private NetworkPlayer _currentVotePlayer;
+        private bool _someoneIsVoted = false;
 
         private void Start()
         {
@@ -23,24 +24,26 @@ namespace Voting
 
         private void Update()
         {
-            Vote();
+            TryVote();
         }
         
-        private void Vote()
+        private void TryVote()
         {
             if (_rayCaster.ViewPointRayCast(out RaycastHit hit, votingRange)) 
             {
                 if (hit.collider.TryGetComponent(out NetworkPlayer otherPlayer) && otherPlayer.State == PlayerState.InVoting)
                 {
-                    if (_currentVotePlayer != null && _currentVotePlayer.Id == otherPlayer.Id) return;
-                    //Debug.Log("pidorasi");
-                    VoteManager.Instance.UnVote(_currentVotePlayer.Id);
-                    _currentVotePlayer= otherPlayer;
+                    if (_someoneIsVoted && _currentVotePlayer.Id == otherPlayer.Id) return;
+                    if (_someoneIsVoted) VoteManager.Instance.UnVote(_currentVotePlayer.Id);
                     VoteManager.Instance.Vote(otherPlayer.Id);
+                    _currentVotePlayer= otherPlayer;
+                    _someoneIsVoted = true;
                 }
-                else
+                else if (_someoneIsVoted)
                 {
+                    VoteManager.Instance.UnVote(_currentVotePlayer.Id);
                     _currentVotePlayer = null;
+                    _someoneIsVoted = false;
                 }
             }
         }

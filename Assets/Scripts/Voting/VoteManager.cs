@@ -1,22 +1,28 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using PlayerScripts;
 using Unity.Netcode;
-using Unity.Networking.Transport;
-using Unity.VisualScripting;
-using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Voting
 {
     public class VoteManager : NetworkBehaviour
     {
-        public NetworkList<int> Votes = new();
+        public NetworkList<int> Votes = new(new List<int>());
         public static VoteManager Instance { get; private set; }
 
         private void Awake()
         {
             Instance = this;
+        }
+
+        private void Start()
+        {
+            if (!IsServer) return;
+            
+            for (int i = 0; i < NetworkManager.Singleton.ConnectedClientsIds.Count; i++)
+            {
+                Votes.Add(0);
+            }
         }
 
         public void Vote(ulong id)
