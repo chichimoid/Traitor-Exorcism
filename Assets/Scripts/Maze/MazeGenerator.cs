@@ -5,15 +5,6 @@ using UnityEngine;
 
 namespace Maze
 {
-    public enum RoomType
-    {
-        Library,
-        Hallway,
-        Warehouse,
-        Lab,
-        Idkwtf
-    }
-
     public struct MazeGeneratorCell : INetworkSerializable
     {
         public int x;
@@ -59,6 +50,10 @@ namespace Maze
             serializer.SerializeValue(ref y);
             serializer.SerializeValue(ref wallBottom);
             serializer.SerializeValue(ref wallLeft);
+            serializer.SerializeValue(ref doorBottom);
+            serializer.SerializeValue(ref doorLeft);
+            serializer.SerializeValue(ref replaceableLeft);
+            serializer.SerializeValue(ref replaceableBottom);
             serializer.SerializeValue(ref visited);
             serializer.SerializeValue(ref roomNumber);
         }
