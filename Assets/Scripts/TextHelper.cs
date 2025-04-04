@@ -12,17 +12,11 @@ public class TextHelper : NetworkBehaviour
         
     public void TempDisplayText32Chars(string text, float duration = 1f)
     {
-        TempDisplayText128ServerRpc((FixedString64Bytes)text, duration);
+        TempDisplayText32Rpc((FixedString64Bytes)text, duration);
     }
 
-    [ServerRpc(RequireOwnership = false)]
-    private void TempDisplayText128ServerRpc(FixedString64Bytes text, float duration)
-    {
-        TempDisplayText128ClientRpc(text, duration);
-    }
-
-    [ClientRpc]
-    private void TempDisplayText128ClientRpc(FixedString64Bytes text, float duration)
+    [Rpc(SendTo.Everyone)]
+    private void TempDisplayText32Rpc(FixedString64Bytes text, float duration)
     {
         if (_hideTextCoroutine != null)
         {

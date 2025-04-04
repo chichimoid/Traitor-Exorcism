@@ -13,7 +13,7 @@ namespace ObjectScripts
         private Quaternion _openRotation;
         private bool _isOpen = false;
         private bool _isMoving = false;
-        public bool IsLocked = false;
+        public bool IsLocked { get; set; } = false;
         private void Start()
         {
             _closedRotation = doorTransform.localRotation;
@@ -21,6 +21,17 @@ namespace ObjectScripts
         }
 
         public void Interact(Transform interactor)
+        {
+            InteractRpc();
+        }
+
+        [Rpc(SendTo.Everyone)]
+        private void InteractRpc()
+        {
+            MoveDoorLocal();
+        }
+        
+        public void MoveDoorLocal()
         {
             if (!_isMoving && !IsLocked)
             {

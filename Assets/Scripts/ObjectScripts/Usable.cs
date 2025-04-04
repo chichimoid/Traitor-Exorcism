@@ -6,17 +6,11 @@ namespace ObjectScripts
     {
         public void Use()
         {
-            UseServerRpc();
+            UseRpc();
         }
 
-        [ServerRpc(RequireOwnership = false)]
-        private void UseServerRpc()
-        {
-            UseClientRpc();
-        }
-
-        [ClientRpc]
-        private void UseClientRpc()
+        [Rpc(SendTo.Everyone)]
+        private void UseRpc()
         {
             UseFunctional();
         }

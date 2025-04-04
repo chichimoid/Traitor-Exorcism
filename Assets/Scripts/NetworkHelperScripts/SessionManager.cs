@@ -17,7 +17,7 @@ namespace NetworkHelperScripts
         {
             if (IsServer)
             {
-                KickEveryoneServerRpc();
+                KickEveryoneRpc();
                 NetworkManager.Singleton.Shutdown();
             }
             else
@@ -31,21 +31,15 @@ namespace NetworkHelperScripts
             KickPlayerServerRpc(playerId);
         }
 
-        [ServerRpc]
+        [Rpc(SendTo.Server)]
         private void KickPlayerServerRpc(ulong playerId)
         {
             NetworkManager.Singleton.DisconnectClient(playerId);
         }
         
-        [ServerRpc]
-        private void KickEveryoneServerRpc()
+        [Rpc(SendTo.NotServer)]
+        private void KickEveryoneRpc()
         {
-            KickEveryoneClientRpc();
-        }
-        [ClientRpc]
-        private void KickEveryoneClientRpc()
-        {
-            if (IsServer) return;
             NetworkManager.Singleton.Shutdown();
         }
     }

@@ -52,20 +52,16 @@ namespace PlayerScripts
                 if (hit.collider.TryGetComponent(out NetworkPlayer otherPlayer) && otherPlayer.State == PlayerState.InMaze)
                 {
                     var heldObj = _networkPlayer.HeldObj;
-                    
-                    AttackServerRpc(new NetworkObjectReference(otherPlayer.gameObject), (heldObj as Weapon)?.Damage ?? bareHandDamage);
+
+                    var attackDamage = (heldObj as Weapon)?.Damage ?? bareHandDamage;
+
+                    AttackRpc(otherPlayer.gameObject, attackDamage, RpcTarget.Single(otherPlayer.Id, RpcTargetUse.Temp));
                 }
             }
         }
 
-        [ServerRpc(RequireOwnership = false)]
-        private void AttackServerRpc(NetworkObjectReference attackedPlayerReference, float damage)
-        {
-            AttackClientRpc(attackedPlayerReference, damage);
-        }
-
-        [ClientRpc]
-        private void AttackClientRpc(NetworkObjectReference attackedPlayerReference, float damage)
+        [Rpc(SendTo.SpecifiedInParams)]
+        private void AttackRpc(NetworkObjectReference attackedPlayerReference, float damage, RpcParams rpcParams)
         {
             attackedPlayerReference.TryGet(out var attackedPlayer);
             var attackedNetworkPlayer = attackedPlayer.GetComponent<NetworkPlayer>();

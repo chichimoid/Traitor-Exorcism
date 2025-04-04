@@ -22,16 +22,15 @@ namespace ObjectScripts
             _upRotation = Quaternion.Euler(_downRotation.eulerAngles.x - rotationAngle, _downRotation.eulerAngles.y, _downRotation.eulerAngles.z);
         }
 
-        private void LeverActionDoor(Transform interactor)
+        private void LeverActionDoor()
         {
             _isUp = !_isUp;
             StartCoroutine(RotateLever());
             door.IsLocked = false;
-            door.Interact(interactor);
+            door.MoveDoorLocal();
             door.IsLocked = true;
-
         }
-        private void LeverAction(Transform interactor)
+        private void LeverAction()
         {
             _isUp = !_isUp;
             StartCoroutine(RotateLever());
@@ -40,15 +39,21 @@ namespace ObjectScripts
 
         public void Interact(Transform interactor)
         {
+            InteractRpc();
+        }
+
+        [Rpc(SendTo.Everyone)]
+        private void InteractRpc()
+        {
             if (!_isMoving)
             {
                 if (door is not null)
                 {
-                    LeverActionDoor(interactor);
+                    LeverActionDoor();
                 }
                 else
                 {
-                    LeverAction(interactor);
+                    LeverAction();
                 }
             }
         }
