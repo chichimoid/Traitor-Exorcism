@@ -7,4 +7,5 @@ using ObjectScripts;
 public class SerializableSOList : ScriptableObject
 {
     public List<GrabbableSO> grabbables;
+    public List<InteractableSO> interactables;
 }

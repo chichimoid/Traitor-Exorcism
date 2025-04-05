@@ -8,13 +8,13 @@ namespace Maze
         private int _length;
         public int Width => _width;
         public int Length => _length;
-        public MazeGeneratorCell[,] Cells { get; set; }
+        public MazeGeneratorCell[,] MazeGeneratorCells { get; set; }
 
         public Maze(int width, int length)
         {
             _width = width;
             _length = length;
-            Cells = new MazeGeneratorCell[width, length];
+            MazeGeneratorCells = new MazeGeneratorCell[width, length];
         }
 
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
@@ -25,7 +25,7 @@ namespace Maze
             if (serializer.IsReader)
             {
                 // If this is a reader, initialize the Cells array
-                Cells = new MazeGeneratorCell[_width, _length];
+                MazeGeneratorCells = new MazeGeneratorCell[_width, _length];
             }
 
             // Serialize each cell in the array
@@ -33,7 +33,7 @@ namespace Maze
             {
                 for (int y = 0; y < Length; y++)
                 {
-                    Cells[x, y].NetworkSerialize(serializer);
+                    MazeGeneratorCells[x, y].NetworkSerialize(serializer);
                 }
             }
         }

@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &6146498833018448691
+--- !u!1 &1026669413012722
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,47 +8,48 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 6146498833018615571}
-  - component: {fileID: 6146498833017288499}
-  - component: {fileID: 6146498833016190451}
-  - component: {fileID: -608325306965068696}
+  - component: {fileID: 4388138100929920}
+  - component: {fileID: 33617211319672918}
+  - component: {fileID: 23406046358271952}
+  - component: {fileID: 8714233949160358984}
+  - component: {fileID: 4259653628817508702}
   m_Layer: 0
-  m_Name: Cabinet04
+  m_Name: Table01v2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &6146498833018615571
+--- !u!4 &4388138100929920
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6146498833018448691}
+  m_GameObject: {fileID: 1026669413012722}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.07809648, z: 0}
-  m_LocalScale: {x: 4, y: 2, z: 4}
-  m_ConstrainProportionsScale: 0
+  m_LocalPosition: {x: 0, y: 0.077807605, z: 0}
+  m_LocalScale: {x: 1.9, y: 1.9, z: 0.95}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &6146498833017288499
+--- !u!33 &33617211319672918
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6146498833018448691}
-  m_Mesh: {fileID: 4300000, guid: 86f5484b88f6e4b40b3111ccff232762, type: 3}
---- !u!23 &6146498833016190451
+  m_GameObject: {fileID: 1026669413012722}
+  m_Mesh: {fileID: 4300000, guid: d63ad3cf858a7384cb2b9b9989e81080, type: 3}
+--- !u!23 &23406046358271952
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6146498833018448691}
+  m_GameObject: {fileID: 1026669413012722}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -65,7 +66,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: d2baf2fc045db4b4997b9871933227f6, type: 2}
+  - {fileID: 2100000, guid: 4d47e1a3163646541bbe77c7ce6d4899, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -87,13 +88,13 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &-608325306965068696
+--- !u!65 &8714233949160358984
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6146498833018448691}
+  m_GameObject: {fileID: 1026669413012722}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -106,5 +107,30 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.9015441, y: 0.7108684, z: 0.28705692}
-  m_Center: {x: 0.0000821352, y: 0.35543433, z: 0.012040935}
+  m_Size: {x: 1.8000001, y: 0.771792, z: 1.0067234}
+  m_Center: {x: -0.000000834465, y: 0.38604054, z: 0.002074331}
+--- !u!114 &4259653628817508702
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1026669413012722}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 888466696
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0

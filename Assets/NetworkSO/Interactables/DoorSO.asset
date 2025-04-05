@@ -9,8 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b5b4fccaa3386224486d958098fff972, type: 3}
-  m_Name: TestCellSO
+  m_Script: {fileID: 11500000, guid: 2b5be29a87df42db807e1b9ae6a0e79d, type: 3}
+  m_Name: DoorSO
   m_EditorClassIdentifier: 
-  prefab: {fileID: 2621618463893933409, guid: f2b8bb58b517ca1478755e5edc54d008, type: 3}
-  objectName: TestCell
+  prefab: {fileID: 1402758661513540240, guid: ac87eb11b8e97b1448caade07fb24f47, type: 3}
+  objectName: Door

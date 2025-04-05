@@ -1,18 +1,15 @@
 using System.Collections.Generic;
-using Unity.Services.Authentication;
-using UnityEditor;
+using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.Rendering;
-using static Unity.Cinemachine.CinemachineSplineRoll;
 
 namespace Maze
 {
-    public class MazeSpawner : MonoBehaviour
+    public class MazeSpawner : NetworkBehaviour
     {
         [SerializeField] private int xOffset;
         [SerializeField] private int yOffset;
         [SerializeField] private int zOffset;
-        [SerializeField] private CellSO cellSO;
+        [SerializeField] private Transform cellPrefab;
         [SerializeField] private Vector3 cellSize;
         
         private Color[] _zoneColors = {
@@ -32,67 +29,75 @@ namespace Maze
     
         public void SpawnMaze()
         {
-            var cells = MazeManager.Instance.Maze.Cells;
+            var mazeGeneratorCells = MazeManager.Instance.Maze.MazeGeneratorCells;
             
-            for (int i = 0; i < cells.GetLength(0); ++i)
+            for (int i = 0; i < mazeGeneratorCells.GetLength(0); ++i)
             {
-                for (int j = 0; j < cells.GetLength(1); ++j)
-                {   
-                    Cell cell = Instantiate(cellSO.prefab, 
+                for (int j = 0; j < mazeGeneratorCells.GetLength(1); ++j)
+                {
+                    CellView cellView = Instantiate(cellPrefab, 
                         new Vector3(i * cellSize.x + xOffset, j * cellSize.y + yOffset, j * cellSize.z + zOffset), 
-                        Quaternion.identity).GetComponent<Cell>();
-                    SpawnBorderWalls(cell, i, j, cells.GetLength(0), cells.GetLength(1));
-
-                    cell.wallLeft.SetActive(cells[i, j].wallLeft);
-                    cell.wallBottom.SetActive(cells[i, j].wallBottom);
-
-                    Wall leftWallObj = cell.wallLeft.GetComponent<Wall>();
-                    Wall bottomWallObj = cell.wallBottom.GetComponent<Wall>();
-
-                    if (cells[i, j].replaceableLeft)
-                    {
-                        SpawnCellObjects(cell, "Wall Left");
-                    } else
-                    {
-                        SpawnObjectsOnWall(cell.wallLeft, "ObjectOnWall1");
-                        SpawnObjectsOnWall(cell.wallLeft, "ObjectOnWall2");
-                    }
-
-                    if (cells[i, j].replaceableBottom)
-                    {
-                        SpawnCellObjects(cell, "Wall Bottom");
-                    } else
-                    {
-                        SpawnObjectsOnWall(cell.wallBottom, "ObjectOnWall1");
-                        SpawnObjectsOnWall(cell.wallBottom, "ObjectOnWall2");
-                    }
-
-                    cell.doorLeft.SetActive(cells[i, j].doorLeft);
-                    cell.doorBottom.SetActive(cells[i, j].doorBottom);
-
-                    cell.lever.SetActive(cells[i, j].isLeverRoom);
+                        Quaternion.identity).GetComponent<CellView>();
                     
-                    Renderer floorRender = cell.floor.GetComponent<Renderer>();
-                    Renderer leftWallRender = cell.wallLeft.GetComponent<Renderer>();
-                    Renderer BottomWallRender = cell.wallBottom.GetComponent<Renderer>();
+                    
+                    SpawnBorderWalls(cellView, i, j, mazeGeneratorCells.GetLength(0), mazeGeneratorCells.GetLength(1));
+                    
+                    cellView.WallLeft.SetActive(mazeGeneratorCells[i, j].wallLeft);
+                    cellView.WallBottom.SetActive(mazeGeneratorCells[i, j].wallBottom);
 
-                    floorRender.material.color = _zoneColors[cells[i, j].zone];
+                    Wall leftWallObj = cellView.WallLeft.GetComponent<Wall>();
+                    Wall bottomWallObj = cellView.WallBottom.GetComponent<Wall>();
+                    
+                    if (IsServer)
+                    {
+                        if (mazeGeneratorCells[i, j].replaceableLeft)
+                        {
+                            SpawnCellObjects(cellView, "Wall Left");
+                        } else
+                        {
+                            SpawnObjectsOnWall(cellView.WallLeft, "ObjectOnWall1");
+                            SpawnObjectsOnWall(cellView.WallLeft, "ObjectOnWall2");
+                        }
+
+                        if (mazeGeneratorCells[i, j].replaceableBottom)
+                        {
+                            SpawnCellObjects(cellView, "Wall Bottom");
+                        } else
+                        {
+                            SpawnObjectsOnWall(cellView.WallBottom, "ObjectOnWall1");
+                            SpawnObjectsOnWall(cellView.WallBottom, "ObjectOnWall2");
+                        }
+                        cellView.DoorLeft.SetActive(mazeGeneratorCells[i, j].doorLeft);
+                        cellView.DoorLeft.GetComponent<NetworkObject>().Spawn();
+                    
+                        cellView.DoorBottom.SetActive(mazeGeneratorCells[i, j].doorBottom);
+                        cellView.DoorBottom.GetComponent<NetworkObject>().Spawn();
+
+                        cellView.Lever.SetActive(mazeGeneratorCells[i, j].isLeverRoom);
+                        cellView.Lever.GetComponent<NetworkObject>().Spawn();
+                    }
+                    
+                    Renderer floorRender = cellView.Floor.GetComponent<Renderer>();
+                    Renderer leftWallRender = cellView.WallLeft.GetComponent<Renderer>();
+                    Renderer BottomWallRender = cellView.WallBottom.GetComponent<Renderer>();
+
+                    floorRender.material.color = _zoneColors[mazeGeneratorCells[i, j].zone];
                     // float roomNum = (cells[i, j].roomNumber - 15) / 60f;
                     // Color wallColor = new Color(roomNum * 2, roomNum, roomNum / 2, roomNum);
-                    Debug.Log(cells[i, j].roomNumber);
-                    Debug.Log($"DoorBottom: {cells[i, j].doorBottom}, DoorLeft: {cells[i, j].doorLeft}");
+                    Debug.Log(mazeGeneratorCells[i, j].roomNumber);
+                    Debug.Log($"DoorBottom: {mazeGeneratorCells[i, j].doorBottom}, DoorLeft: {mazeGeneratorCells[i, j].doorLeft}");
                     // leftWallRender.material.color = wallColor;
                     // BottomWallRender.material.color = wallColor;
                 }
             }
         }
 
-        private void SpawnCellObjects(Cell cell, string objectName)
+        private void SpawnCellObjects(CellView cellView, string objectName)
         {
-            Transform wallSlot = cell.transform.Find(objectName);
+            Transform wallSlot = cellView.transform.Find(objectName);
 
             // GameObject wallObject = cell.walls[UnityEngine.Random.Range(0, cell.walls.Count)];
-            GameObject wallObject = GetRandomPrefab(cell.walls);
+            GameObject wallObject = GetRandomPrefab(cellView.Walls);
             if (wallObject == null)
             {
                 return;
@@ -105,6 +110,8 @@ namespace Maze
             ApplyRandomTransform(spawnedObj.transform);
             AdjustPrefabScale(wallObject);
             SnapToGroundWithRaycast(wallObject);
+            
+            spawnedObj.GetComponent<NetworkObject>().Spawn(true);
         }
 
         private void ApplyRandomTransform(Transform targetTransform)
@@ -139,27 +146,29 @@ namespace Maze
             {
                 return;
             }
-            Instantiate(wallObject, wallSlot);
+            var spawnedObj = Instantiate(wallObject, wallSlot);
+            
+            spawnedObj.GetComponent<NetworkObject>().Spawn(true);
         }
 
-        private void SpawnBorderWalls(Cell cell, int i, int j, int width, int height)
+        private void SpawnBorderWalls(CellView cellView, int i, int j, int width, int height)
         {
-            if (i == width - 1 && cell.wallLeft != null)
+            if (i == width - 1 && cellView.WallLeft != null)
             {
-                GameObject rightWall = Instantiate(cell.wallLeft, cell.transform);
-                rightWall.transform.localPosition = new Vector3(-cell.wallLeft.transform.localPosition.x,
-                                                             cell.wallLeft.transform.localPosition.y,
-                                                             cell.wallLeft.transform.localPosition.z);
+                GameObject rightWall = Instantiate(cellView.WallLeft, cellView.transform);
+                rightWall.transform.localPosition = new Vector3(-cellView.WallLeft.transform.localPosition.x,
+                                                             cellView.WallLeft.transform.localPosition.y,
+                                                             cellView.WallLeft.transform.localPosition.z);
                 rightWall.transform.localRotation = Quaternion.Euler(0, 90, 0);
                 rightWall.SetActive(true);
             }
 
-            if (j == height - 1 && cell.wallBottom != null)
+            if (j == height - 1 && cellView.WallBottom != null)
             {
-                GameObject topWall = Instantiate(cell.wallBottom, cell.transform);
-                topWall.transform.localPosition = new Vector3(cell.wallBottom.transform.localPosition.x,
-                                                            cell.wallBottom.transform.localPosition.y,
-                                                            -cell.wallBottom.transform.localPosition.z);
+                GameObject topWall = Instantiate(cellView.WallBottom, cellView.transform);
+                topWall.transform.localPosition = new Vector3(cellView.WallBottom.transform.localPosition.x,
+                                                            cellView.WallBottom.transform.localPosition.y,
+                                                            -cellView.WallBottom.transform.localPosition.z);
                 topWall.transform.localRotation = Quaternion.Euler(0, 180, 0);
                 topWall.SetActive(true);
             }
