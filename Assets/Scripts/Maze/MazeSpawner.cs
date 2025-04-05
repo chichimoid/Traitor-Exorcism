@@ -50,19 +50,19 @@ namespace Maze
                     
                     if (IsServer)
                     {
-                        if (mazeGeneratorCells[i, j].replaceableLeft)
+                        if (mazeGeneratorCells[i, j].replaceableLeft && !mazeGeneratorCells[i, j].doorLeft)
                         {
                             SpawnCellObjects(cellView, "Wall Left");
-                        } else
+                        } else if (!mazeGeneratorCells[i, j].doorLeft)
                         {
                             SpawnObjectsOnWall(cellView.WallLeft, "ObjectOnWall1");
                             SpawnObjectsOnWall(cellView.WallLeft, "ObjectOnWall2");
                         }
 
-                        if (mazeGeneratorCells[i, j].replaceableBottom)
+                        if (mazeGeneratorCells[i, j].replaceableBottom && !mazeGeneratorCells[i, j].doorBottom)
                         {
                             SpawnCellObjects(cellView, "Wall Bottom");
-                        } else
+                        } else if (!mazeGeneratorCells[i, j].doorBottom)
                         {
                             SpawnObjectsOnWall(cellView.WallBottom, "ObjectOnWall1");
                             SpawnObjectsOnWall(cellView.WallBottom, "ObjectOnWall2");

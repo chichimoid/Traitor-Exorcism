@@ -60,26 +60,20 @@ MonoBehaviour:
   <Walls>k__BackingField:
   - prefab: {fileID: 155314, guid: 5713ed639ef83f945b71f3b92342d629, type: 3}
     weight: 1
-  - prefab: {fileID: 8680301532144282658, guid: e3729cab5cd8f4c459ef8d249965eeae, type: 3}
-    weight: 1
-  - prefab: {fileID: 6146498833018448691, guid: d7f16bebf84a8be45a4edf754a799508, type: 3}
-    weight: 1
-  - prefab: {fileID: 1551099783998600, guid: a4e0ff4643b80d547ba35af8e6089350, type: 3}
+  - prefab: {fileID: 143668, guid: 381bdf9c7f27cce46b2699033a9b735a, type: 3}
     weight: 1
   - prefab: {fileID: 3695430918361020415, guid: 001d511e94541e648a671aa2928eab96, type: 3}
     weight: 1
-  - prefab: {fileID: 1793340289879562, guid: 0b4e64b68be2d404f8d503ed5ca46526, type: 3}
-    weight: 1
-  - prefab: {fileID: 143668, guid: 381bdf9c7f27cce46b2699033a9b735a, type: 3}
-    weight: 1
   - prefab: {fileID: 1026669413012722, guid: 57d3e693aabffc0469483a7ea0e6d1e5, type: 3}
     weight: 1
-  - prefab: {fileID: 1497028668054882, guid: 5d17cce7704ff0c44985b9f2b7c1f930, type: 3}
-    weight: 1
-  - prefab: {fileID: 1497028668054882, guid: 5d17cce7704ff0c44985b9f2b7c1f930, type: 3}
+  - prefab: {fileID: 6146498833018448691, guid: d7f16bebf84a8be45a4edf754a799508, type: 3}
     weight: 1
   - prefab: {fileID: 0}
     weight: 9
+  - prefab: {fileID: 1551099783998600, guid: a4e0ff4643b80d547ba35af8e6089350, type: 3}
+    weight: 1
+  - prefab: {fileID: 1793340289879562, guid: 0b4e64b68be2d404f8d503ed5ca46526, type: 3}
+    weight: 1
 --- !u!1 &1240175815084756474
 GameObject:
   m_ObjectHideFlags: 0
@@ -218,6 +212,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2621618463893933409}
     m_Modifications:
+    - target: {fileID: 1894652371854345355, guid: e348e7143b6247b488737e4be26fb038, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 1153751668
+      objectReference: {fileID: 0}
     - target: {fileID: 5239272197777735519, guid: e348e7143b6247b488737e4be26fb038, type: 3}
       propertyPath: m_LocalScale.x
       value: 2.5
@@ -377,6 +375,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 8739399555204932085, guid: ac87eb11b8e97b1448caade07fb24f47, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 1946789158
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -456,6 +458,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 8739399555204932085, guid: ac87eb11b8e97b1448caade07fb24f47, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 938907981
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -479,6 +485,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2621618463893933409}
     m_Modifications:
+    - target: {fileID: 1894652371854345355, guid: e348e7143b6247b488737e4be26fb038, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 3024431918
+      objectReference: {fileID: 0}
     - target: {fileID: 5239272197777735519, guid: e348e7143b6247b488737e4be26fb038, type: 3}
       propertyPath: m_LocalScale.x
       value: 2.5
@@ -637,6 +647,10 @@ PrefabInstance:
     - target: {fileID: 2575938327731363396, guid: 9befcb486581cd7458e005c1d94f893d, type: 3}
       propertyPath: m_Name
       value: Lever
+      objectReference: {fileID: 0}
+    - target: {fileID: 3634545221040476795, guid: 9befcb486581cd7458e005c1d94f893d, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 3042224455
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
