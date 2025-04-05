@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1238126228
+  GlobalObjectIdHash: 2575815502
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -76,3 +76,5 @@ MonoBehaviour:
   zOffset: -25
   cellPrefab: {fileID: 2621618463893933409, guid: f2b8bb58b517ca1478755e5edc54d008, type: 3}
   cellSize: {x: 5, y: 0, z: 5}
+  doorPrefab: {fileID: 1402758661513540240, guid: ac87eb11b8e97b1448caade07fb24f47, type: 3}
+  leverPrefab: {fileID: 1577609632647162967, guid: 9befcb486581cd7458e005c1d94f893d, type: 3}

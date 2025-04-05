@@ -2,7 +2,7 @@
 
 namespace Maze
 {
-    public struct Maze : INetworkSerializable
+    public struct MazeData : INetworkSerializable
     {
         private int _width;
         private int _length;
@@ -10,7 +10,7 @@ namespace Maze
         public int Length => _length;
         public MazeGeneratorCell[,] MazeGeneratorCells { get; set; }
 
-        public Maze(int width, int length)
+        public MazeData(int width, int length)
         {
             _width = width;
             _length = length;

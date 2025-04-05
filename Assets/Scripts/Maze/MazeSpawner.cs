@@ -11,6 +11,8 @@ namespace Maze
         [SerializeField] private int zOffset;
         [SerializeField] private Transform cellPrefab;
         [SerializeField] private Vector3 cellSize;
+        [SerializeField] private Transform doorPrefab;
+        [SerializeField] private Transform leverPrefab;
         
         private Color[] _zoneColors = {
             Color.red,
@@ -19,18 +21,10 @@ namespace Maze
             Color.yellow,
             Color.cyan,
         };
-    
-        public static MazeSpawner Instance { get; private set; }
-
-        private void Awake()
+        
+        public void SpawnMaze(MazeData data)
         {
-            Instance = this;
-        }
-    
-        public void SpawnMaze()
-        {
-            var mazeGeneratorCells = MazeManager.Instance.Maze.MazeGeneratorCells;
-            
+            var mazeGeneratorCells = data.MazeGeneratorCells;
             for (int i = 0; i < mazeGeneratorCells.GetLength(0); ++i)
             {
                 for (int j = 0; j < mazeGeneratorCells.GetLength(1); ++j)
@@ -38,6 +32,7 @@ namespace Maze
                     CellView cellView = Instantiate(cellPrefab, 
                         new Vector3(i * cellSize.x + xOffset, j * cellSize.y + yOffset, j * cellSize.z + zOffset), 
                         Quaternion.identity).GetComponent<CellView>();
+                    cellView.GetComponent<NetworkObject>().Spawn(true);
                     
                     
                     SpawnBorderWalls(cellView, i, j, mazeGeneratorCells.GetLength(0), mazeGeneratorCells.GetLength(1));
@@ -48,34 +43,56 @@ namespace Maze
                     Wall leftWallObj = cellView.WallLeft.GetComponent<Wall>();
                     Wall bottomWallObj = cellView.WallBottom.GetComponent<Wall>();
                     
-                    if (IsServer)
-                    {
-                        if (mazeGeneratorCells[i, j].replaceableLeft && !mazeGeneratorCells[i, j].doorLeft)
+                    if (!mazeGeneratorCells[i, j].doorLeft)
                         {
-                            SpawnCellObjects(cellView, "Wall Left");
-                        } else if (!mazeGeneratorCells[i, j].doorLeft)
+                            if (mazeGeneratorCells[i, j].replaceableLeft)
+                            {
+                                SpawnCellObjects(cellView, "Wall Left");
+                            } else
+                            {
+                                SpawnObjectsOnWall(cellView.WallLeft, "ObjectOnWall1");
+                                SpawnObjectsOnWall(cellView.WallLeft, "ObjectOnWall2");
+                            }
+                            
+                            Destroy(cellView.DoorLeft.gameObject);
+                        }
+                        else
                         {
-                            SpawnObjectsOnWall(cellView.WallLeft, "ObjectOnWall1");
-                            SpawnObjectsOnWall(cellView.WallLeft, "ObjectOnWall2");
+                            var spawnedObj = Instantiate(doorPrefab, cellView.DoorLeft.transform.position, cellView.DoorLeft.transform.rotation);
+                            spawnedObj.transform.localScale = cellView.DoorLeft.transform.localScale;
+                            spawnedObj.GetComponent<NetworkObject>().Spawn();
+                        }
+                        
+                        if (!mazeGeneratorCells[i, j].doorBottom)
+                        {
+                            if (mazeGeneratorCells[i, j].replaceableBottom)
+                            {
+                                SpawnCellObjects(cellView, "Wall Bottom");
+                            } else
+                            {
+                                SpawnObjectsOnWall(cellView.WallBottom, "ObjectOnWall1");
+                                SpawnObjectsOnWall(cellView.WallBottom, "ObjectOnWall2");
+                            }
+                            
+                            Destroy(cellView.DoorBottom.gameObject);
+                        }
+                        else
+                        {
+                            var spawnedObj = Instantiate(doorPrefab, cellView.DoorBottom.transform.position, cellView.DoorBottom.transform.rotation);
+                            spawnedObj.transform.localScale = cellView.DoorBottom.transform.localScale;
+                            spawnedObj.GetComponent<NetworkObject>().Spawn();
                         }
 
-                        if (mazeGeneratorCells[i, j].replaceableBottom && !mazeGeneratorCells[i, j].doorBottom)
+                        if (!mazeGeneratorCells[i, j].isLeverRoom)
                         {
-                            SpawnCellObjects(cellView, "Wall Bottom");
-                        } else if (!mazeGeneratorCells[i, j].doorBottom)
-                        {
-                            SpawnObjectsOnWall(cellView.WallBottom, "ObjectOnWall1");
-                            SpawnObjectsOnWall(cellView.WallBottom, "ObjectOnWall2");
+                            Destroy(cellView.Lever.gameObject);
                         }
-                        cellView.DoorLeft.SetActive(mazeGeneratorCells[i, j].doorLeft);
-                        cellView.DoorLeft.GetComponent<NetworkObject>().Spawn();
-                    
-                        cellView.DoorBottom.SetActive(mazeGeneratorCells[i, j].doorBottom);
-                        cellView.DoorBottom.GetComponent<NetworkObject>().Spawn();
-
-                        cellView.Lever.SetActive(mazeGeneratorCells[i, j].isLeverRoom);
-                        cellView.Lever.GetComponent<NetworkObject>().Spawn();
-                    }
+                        else
+                        {
+                            var spawnedObj = Instantiate(leverPrefab, cellView.Lever.transform.position, cellView.Lever.transform.rotation);
+                            spawnedObj.transform.localScale = cellView.Lever.transform.localScale;
+                            spawnedObj.GetComponent<NetworkObject>().Spawn();
+                        }
                     
                     Renderer floorRender = cellView.Floor.GetComponent<Renderer>();
                     Renderer leftWallRender = cellView.WallLeft.GetComponent<Renderer>();
@@ -106,7 +123,7 @@ namespace Maze
             if (wallSlot.childCount > 0)
                 Destroy(wallSlot.GetChild(0).gameObject);
 
-            GameObject spawnedObj = Instantiate(wallObject, wallSlot);
+            GameObject spawnedObj = Instantiate(wallObject, wallSlot.position, wallSlot.rotation);
             ApplyRandomTransform(spawnedObj.transform);
             AdjustPrefabScale(wallObject);
             SnapToGroundWithRaycast(wallObject);
@@ -146,8 +163,9 @@ namespace Maze
             {
                 return;
             }
-            var spawnedObj = Instantiate(wallObject, wallSlot);
-            
+            var spawnedObj = Instantiate(wallObject, wallSlot.position, Quaternion.Euler(wallObject.transform.localRotation.x, 
+                wallSlot.rotation.eulerAngles.y, 
+                wallObject.transform.localRotation.z));
             spawnedObj.GetComponent<NetworkObject>().Spawn(true);
         }
 
@@ -161,6 +179,7 @@ namespace Maze
                                                              cellView.WallLeft.transform.localPosition.z);
                 rightWall.transform.localRotation = Quaternion.Euler(0, 90, 0);
                 rightWall.SetActive(true);
+                cellView.GetComponent<NetworkObject>().Spawn(true);
             }
 
             if (j == height - 1 && cellView.WallBottom != null)
@@ -171,6 +190,7 @@ namespace Maze
                                                             -cellView.WallBottom.transform.localPosition.z);
                 topWall.transform.localRotation = Quaternion.Euler(0, 180, 0);
                 topWall.SetActive(true);
+                cellView.GetComponent<NetworkObject>().Spawn(true);
             }
         }
 

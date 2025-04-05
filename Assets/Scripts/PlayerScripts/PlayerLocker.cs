@@ -42,6 +42,15 @@ namespace PlayerScripts
         {
             _playerMovement.CanMove = true;
         }
+        
+        public void LockRotation()
+        {
+            _playerRotation.CanRotate = false;
+        }
+        public void UnlockRotation()
+        {
+            _playerRotation.CanRotate = true;
+        }
 
         public void LockPhysics()
         {

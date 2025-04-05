@@ -13,10 +13,10 @@ namespace Maze
     {
         [field:SerializeField] public GameObject WallLeft { get; private set; }
         [field:SerializeField] public GameObject WallBottom { get; private set; }
-        [field:SerializeField] public GameObject DoorLeft { get; private set; }
-        [field:SerializeField] public GameObject DoorBottom { get; private set; }
+        [field:SerializeField] public Transform DoorLeft { get; private set; }
+        [field:SerializeField] public Transform DoorBottom { get; private set; }
         [field:SerializeField] public GameObject Floor { get; private set; }
-        [field:SerializeField] public GameObject Lever { get; private set; }
+        [field:SerializeField] public Transform Lever { get; private set; }
         [field:SerializeField] public List<WeightedPrefab> Walls { get; private set; }
     }
 }
