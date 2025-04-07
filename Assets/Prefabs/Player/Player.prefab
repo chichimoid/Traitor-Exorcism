@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &335272196869773573
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2951693483209674944}
+  m_Layer: 0
+  m_Name: HoldPointSecond
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2951693483209674944
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 335272196869773573}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.73, y: -0.41600004, z: 0.7}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2967216200531195706}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &583485603663504339
 GameObject:
   m_ObjectHideFlags: 0
@@ -10,7 +41,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9182101518735603467}
   m_Layer: 0
-  m_Name: HoldPoint
+  m_Name: HoldPointMain
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -25,11 +56,11 @@ Transform:
   m_GameObject: {fileID: 583485603663504339}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.5, y: 0, z: 0.7}
+  m_LocalPosition: {x: 0.5, y: -0.416, z: 0.7}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 39452889765503295}
+  m_Father: {fileID: 2967216200531195706}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &796897697459312627
 GameObject:
@@ -265,7 +296,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 9182101518735603467}
   - {fileID: 2967216200531195706}
   - {fileID: 6007813851276063219}
   - {fileID: 1042099072430833530}
@@ -523,7 +553,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   interactionRange: 3
-  holdPointTransform: {fileID: 9182101518735603467}
+  holdPointTransformMain: {fileID: 9182101518735603467}
+  holdPointTransformSecond: {fileID: 2951693483209674944}
 --- !u!114 &3746074126065957678
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -893,6 +924,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 9182101518735603467}
+  - {fileID: 2951693483209674944}
   m_Father: {fileID: 39452889765503295}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

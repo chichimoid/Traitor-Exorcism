@@ -32,7 +32,10 @@ namespace PlayerScripts
             get => _infection.Value;
             set => _infection.Value = value;
         }
-
+        public float MaxHealth
+        {
+            get => maxHealth;
+        }
         private void Start()
         {
             if (!IsOwner) return;

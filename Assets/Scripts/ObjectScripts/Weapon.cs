@@ -2,7 +2,7 @@
 
 namespace ObjectScripts
 {
-    public abstract class Weapon : Grabbable
+    public abstract class Weapon : Usable
     {
          public abstract float Damage { get; protected set; }
     }

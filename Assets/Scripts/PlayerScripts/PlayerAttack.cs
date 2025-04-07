@@ -51,7 +51,7 @@ namespace PlayerScripts
             {
                 if (hit.collider.TryGetComponent(out NetworkPlayer otherPlayer) && otherPlayer.State == PlayerState.InMaze)
                 {
-                    var heldObj = _networkPlayer.HeldObj;
+                    var heldObj = _networkPlayer.HeldObjMain;
 
                     var attackDamage = (heldObj as Weapon)?.Damage ?? bareHandDamage;
 

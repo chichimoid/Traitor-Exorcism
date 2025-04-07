@@ -7,11 +7,12 @@ namespace ObjectScripts
     public abstract class Grabbable : NetworkBehaviour, IGrabbable
     {
         [SerializeField] private GrabbableSO grabbableSO;
-    
+
         private Rigidbody _objectRigidbody;
         private Collider _objectCollider;
         private bool _canInteract = true;
-    
+        public Transform player; 
+
         private void Awake()
         {
             _objectRigidbody = GetComponent<Rigidbody>();
@@ -22,37 +23,54 @@ namespace ObjectScripts
         {
             return _canInteract;
         }
-        
         public void Interact(Transform interactor)
         {
-            GrabbableSetFollowTransformRpc(interactor.GetComponent<NetworkObject>());
+            GrabbableSetFollowTransformServerRpc(interactor.GetComponent<NetworkObject>());
+            player = interactor;
+            // Functional();
         }
 
-        [Rpc(SendTo.Everyone)]
-        private void GrabbableSetFollowTransformRpc(NetworkObjectReference parentReference)
+        // protected abstract void Functional();
+
+        [ServerRpc(RequireOwnership = false)]
+        public void GrabbableSetFollowTransformServerRpc(NetworkObjectReference parentReference)
+        {
+            GrabbableSetFollowTransformClientRpc(parentReference);
+        }
+
+        [ClientRpc]
+        private void GrabbableSetFollowTransformClientRpc(NetworkObjectReference parentReference)
         {
             _canInteract = false;
-            
             _objectRigidbody.isKinematic = true;
             _objectCollider.isTrigger = true;
-            
-            parentReference.TryGet(out var parent);
-            FollowTransformManager.Instance.Follow(transform, parent.GetComponent<PlayerInteract>().HoldPointTransform);
+
+            parentReference.TryGet(out NetworkObject parent);
+            if (parent.GetComponent<PlayerInteract>().NetworkPlayer.HeldObjSecond is not null)
+            {
+                FollowTransformManager.Instance.Follow(transform, parent.GetComponent<PlayerInteract>().HoldPointTransformSecond);
+                return;
+            }
+            FollowTransformManager.Instance.Follow(transform, parent.GetComponent<PlayerInteract>().HoldPointTransformMain);
         }
 
         public void Drop()
         {
-            DropRpc();
+            DropServerRpc();
         }
-        
-        [Rpc(SendTo.Everyone)]
-        private void DropRpc()
+        [ServerRpc(RequireOwnership = false)]
+        private void DropServerRpc()
         {
-            FollowTransformManager.Instance.Unfollow(transform);
-            
+            DropClientRpc();
+        }
+
+        [ClientRpc]
+        private void DropClientRpc()
+        {
             _objectRigidbody.isKinematic = false;
             _objectCollider.isTrigger = false;
-            
+
+            FollowTransformManager.Instance.Unfollow(transform);
             _canInteract = true;
         }
     }

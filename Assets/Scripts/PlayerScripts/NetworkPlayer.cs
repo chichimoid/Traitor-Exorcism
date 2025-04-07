@@ -54,7 +54,9 @@ namespace PlayerScripts
 
         public PlayerRole Role { get => _role.Value; set => _role.Value = value; }
         
-        [CanBeNull] public IGrabbable HeldObj { get; set; }
+        [CanBeNull] public IGrabbable HeldObjMain { get; set; }
+        [CanBeNull] public IGrabbable HeldObjSecond { get; set; }
+
 
         private void Start()
         {
