@@ -16,12 +16,12 @@ namespace ObjectScripts
             }
             if(player.GetComponent<PlayerHealth>().Health == player.GetComponent<PlayerHealth>().MaxHealth)
             {
-                Debug.Log("You have a full health! Сбереги свою аптечку!");
+                Debug.Log("You have a full health! пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ!");
                 return;
             }
-            player.GetComponent<PlayerHealth>().DamageHealth(-20);
+            player.GetComponent<PlayerHealth>().RegenHealth(20);
             _count--;
-            Debug.Log($"Current health: {player.GetComponent<PlayerHealth>().Health}. Осталось использований: {_count}");
+            Debug.Log($"Current health: {player.GetComponent<PlayerHealth>().Health}. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: {_count}");
         }
     }
 }

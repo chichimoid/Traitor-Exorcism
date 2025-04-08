@@ -44,6 +44,14 @@ namespace PlayerScripts
             _infection = new FixedIntervalFloat(0, maxImmunity);
         }
 
+        public void RegenHealth(float value)
+        {
+            if (!IsOwner) return;
+            
+            Health += regenValue;
+            GlobalDebugger.Instance.Log($"Player {NetworkManager.Singleton.LocalClientId} health changed: {Health}");
+        }
+        
         public void DamageHealth(float value)
         {
             if (!IsOwner) return;

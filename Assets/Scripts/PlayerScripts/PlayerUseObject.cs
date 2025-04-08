@@ -42,6 +42,7 @@ namespace PlayerScripts
         {
             if (_networkPlayer.HeldObjMain is IUsable usable) {
                 usable.Use();
+                Debug.Log("Used");
             }
         }
     }

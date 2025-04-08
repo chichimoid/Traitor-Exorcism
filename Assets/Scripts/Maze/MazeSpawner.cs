@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using Unity.Collections;
+using Unity.Netcode;
 using Unity.Services.Authentication;
 using UnityEditor;
 using UnityEngine;
@@ -7,13 +9,16 @@ using static Unity.Cinemachine.CinemachineSplineRoll;
 
 namespace Maze
 {
-    public class MazeSpawner : MonoBehaviour
+    public class MazeSpawner : NetworkBehaviour
     {
         [SerializeField] private int xOffset;
         [SerializeField] private int yOffset;
         [SerializeField] private int zOffset;
-        [SerializeField] private CellSO cellSO;
+        [SerializeField] private Transform cellPrefab;
         [SerializeField] private Vector3 cellSize;
+        [SerializeField] private Transform doorPrefab;
+        [SerializeField] private Transform leverPrefab;
+        [SerializeField] private Transform wallPrefab;
         
         private Color[] _zoneColors = {
             Color.red,
@@ -30,28 +35,37 @@ namespace Maze
             Instance = this;
         }
     
-        public void SpawnMaze()
+        public void SpawnMaze(MazeData mazeData)
         {
-            var cells = MazeManager.Instance.Maze.Cells;
+            var cells = mazeData.MazeGeneratorCells;
             
             for (int i = 0; i < cells.GetLength(0); ++i)
             {
                 for (int j = 0; j < cells.GetLength(1); ++j)
                 {   
-                    Cell cell = Instantiate(cellSO.prefab, 
+                    Cell cell = Instantiate(cellPrefab, 
                         new Vector3(i * cellSize.x + xOffset, j * cellSize.y + yOffset, j * cellSize.z + zOffset), 
                         Quaternion.identity).GetComponent<Cell>();
-                    SpawnBorderWalls(cell, i, j, cells.GetLength(0), cells.GetLength(1));
+                    cell.GetComponent<NetworkObject>().Spawn(true);
+                    
+                    SpawnBorderWallsRpc(cell.GetComponent<NetworkObject>(), i, j, cells.GetLength(0), cells.GetLength(1));
 
-                    cell.wallLeft.SetActive(cells[i, j].wallLeft);
-                    cell.wallBottom.SetActive(cells[i, j].wallBottom);
+                    if (!cells[i, j].wallLeft)
+                    {
+                        DestroyWallRpc(cell.GetComponent<NetworkObject>(), true);
+                    }
+
+                    if (!cells[i, j].wallBottom)
+                    {
+                        DestroyWallRpc(cell.GetComponent<NetworkObject>(), false);
+                    }
 
                     Wall leftWallObj = cell.wallLeft.GetComponent<Wall>();
                     Wall bottomWallObj = cell.wallBottom.GetComponent<Wall>();
 
                     if (cells[i, j].replaceableLeft)
                     {
-                        SpawnCellObjects(cell, "Wall Left", cell.walls);
+                        SpawnCellObjects(cell, "Wall Left", cell.walls, false, false);
                     } else
                     {
                         SpawnObjectsOnWall(cell.wallLeft, "ObjectOnWall1");
@@ -60,26 +74,50 @@ namespace Maze
 
                     if (cells[i, j].replaceableBottom)
                     {
-                        SpawnCellObjects(cell, "Wall Bottom", cell.walls);
+                        SpawnCellObjects(cell, "Wall Bottom", cell.walls, false, false);
                     } else
                     {
                         SpawnObjectsOnWall(cell.wallBottom, "ObjectOnWall1");
                         SpawnObjectsOnWall(cell.wallBottom, "ObjectOnWall2");
                     }
 
-                    SpawnCellObjects(cell, "ItemSlot1", cell.items);
-                    SpawnCellObjects(cell, "ItemSlot2", cell.items);
+                    SpawnCellObjects(cell, "ItemSlot1", cell.items, false, false);
+                    SpawnCellObjects(cell, "ItemSlot2", cell.items, false, false);
 
-                    cell.doorLeft.SetActive(cells[i, j].doorLeft);
-                    cell.doorBottom.SetActive(cells[i, j].doorBottom);
-
-                    cell.lever.SetActive(cells[i, j].isLeverRoom);
+                    if (cells[i, j].doorLeft)
+                    {
+                        var spawnedObj = Instantiate(doorPrefab, cell.doorLeft.transform.position, cell.doorLeft.transform.rotation);
+                        spawnedObj.transform.localScale = cell.doorLeft.transform.localScale;
+                        spawnedObj.GetComponent<NetworkObject>().Spawn(true);
+                    }
+                    else
+                    {
+                        Destroy(cell.doorLeft);
+                    }
                     
-                    Renderer floorRender = cell.floor.GetComponent<Renderer>();
-                    Renderer leftWallRender = cell.wallLeft.GetComponent<Renderer>();
-                    Renderer BottomWallRender = cell.wallBottom.GetComponent<Renderer>();
+                    if (cells[i, j].doorBottom)
+                    {
+                        var spawnedObj = Instantiate(doorPrefab, cell.doorBottom.transform.position, cell.doorBottom.transform.rotation);
+                        spawnedObj.transform.localScale = cell.doorBottom.transform.localScale;
+                        spawnedObj.GetComponent<NetworkObject>().Spawn(true);
+                    }
+                    else
+                    {
+                        Destroy(cell.doorBottom);
+                    }
+                    
+                    if (cells[i, j].isLeverRoom)
+                    {
+                        var spawnedObj = Instantiate(leverPrefab, cell.lever.transform.position, cell.lever.transform.rotation);
+                        spawnedObj.transform.localScale = cell.lever.transform.localScale;
+                        spawnedObj.GetComponent<NetworkObject>().Spawn(true);
+                    }
+                    else
+                    {
+                        Destroy(cell.lever);
+                    }
 
-                    floorRender.material.color = _zoneColors[cells[i, j].zone];
+                    SetFloorColorRpc(cell.GetComponent<NetworkObject>(), mazeData, i, j);
                     // float roomNum = (cells[i, j].roomNumber - 15) / 60f;
                     // Color wallColor = new Color(roomNum * 2, roomNum, roomNum / 2, roomNum);
                     Debug.Log(cells[i, j].roomNumber);
@@ -89,9 +127,30 @@ namespace Maze
                 }
             }
         }
+        /// <param name="leftWall">
+        /// true = wallLeft, false = wallBottom
+        /// </param>
+        [Rpc(SendTo.Everyone)]
+        private void DestroyWallRpc(NetworkObjectReference cellReference, bool leftWall)
+        {
+            cellReference.TryGet(out var cellObj);
+            var cell = cellObj.GetComponent<Cell>();
+            Destroy(leftWall ? cell.wallLeft : cell.wallBottom);
+        }
 
-
-        private void SpawnCellObjects(Cell cell, string objectName, List<WeightedPrefab> objList, bool scale=true)
+        [Rpc(SendTo.Everyone)]
+        private void SetFloorColorRpc(NetworkObjectReference cellReference, MazeData mazeData, int i, int j)
+        {
+            cellReference.TryGet(out var cellObj);
+            var cell = cellObj.GetComponent<Cell>();
+            Renderer floorRender = cell.floor.GetComponent<Renderer>();
+            Renderer leftWallRender = cell.wallLeft.GetComponent<Renderer>();
+            Renderer BottomWallRender = cell.wallBottom.GetComponent<Renderer>();
+            var cells = mazeData.MazeGeneratorCells;
+            floorRender.material.color = _zoneColors[cells[i, j].zone];
+        }
+        
+        private void SpawnCellObjects(Cell cell, string objectName, List<WeightedPrefab> objList, bool scale=true, bool spawnAsChild = true)
         {
             Transform wallSlot = cell.transform.Find(objectName);
             Debug.Log($"Spawning in {objectName}");
@@ -102,15 +161,23 @@ namespace Maze
             }
 
             if (wallSlot.childCount > 0)
-                Destroy(wallSlot.GetChild(0).gameObject);
+                DestroyWallSlotObjRpc(cell.GetComponent<NetworkObject>(), objectName);
 
             //GameObject spawnedObj = Instantiate(wallObject, wallSlot);
             //ApplyRandomTransform(spawnedObj.transform);
 
-            GameObject spawnedObj = Instantiate(wallObject, wallSlot);
+            GameObject spawnedObj;
+            if (spawnAsChild)
+            {
+                spawnedObj = Instantiate(wallObject, wallSlot);
+            }
+            else
+            {
+                spawnedObj = Instantiate(wallObject, wallSlot.transform.position, wallSlot.transform.rotation);
+            }
             Debug.Log($"My position is {spawnedObj.transform.localPosition}");
-            // spawnedObj.transform.localPosition = Vector3.zero; // Сбрасываем позицию
-            // spawnedObj.transform.localRotation = Quaternion.identity; // Сбрасываем поворот
+            // spawnedObj.transform.localPosition = Vector3.zero; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+            // spawnedObj.transform.localRotation = Quaternion.identity; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             ApplyRandomTransform(spawnedObj.transform);
 
             if (scale)
@@ -118,13 +185,26 @@ namespace Maze
                 AdjustPrefabScale(spawnedObj);
             }
             // SnapToGroundWithRaycast(spawnedObj);
+
+            if (!spawnAsChild)
+            {
+                spawnedObj.GetComponent<NetworkObject>().Spawn(true);
+            }
+        }
+        
+        [Rpc(SendTo.Everyone)]
+        private void DestroyWallSlotObjRpc(NetworkObjectReference cellReference, FixedString64Bytes objectName64Bytes)
+        {
+            cellReference.TryGet(out var cellObj);
+            Transform wallSlot = cellObj.transform.Find(objectName64Bytes.ToString());
+            Destroy(wallSlot.GetChild(0).gameObject);
         }
 
         private void ApplyRandomTransform(Transform targetTransform)
         {
             if (PrefabUtility.IsPartOfPrefabAsset(targetTransform))
             {
-                Debug.LogError("Пытаетесь изменить оригинальный префаб! Используйте Instantiate.");
+                Debug.LogError("пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ! пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ Instantiate.");
                 return;
             }
             Vector3 originalPosition = targetTransform.position;
@@ -159,7 +239,7 @@ namespace Maze
                     myCollider.transform.rotation
                 );
 
-                if (overlappingColliders.Length > 1) // >1, потому что сам объект тоже попадает в массив
+                if (overlappingColliders.Length > 1) // >1, пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
                 {
                     return true;
                 }
@@ -189,9 +269,16 @@ namespace Maze
             {
                 return;
             }
-            Instantiate(wallObject, wallSlot);
+            var spawnedObj = Instantiate(wallObject, wallSlot.transform.position, wallSlot.transform.rotation);
+            spawnedObj.GetComponent<NetworkObject>().Spawn(true);
         }
 
+        [Rpc(SendTo.Everyone)]
+        private void SpawnBorderWallsRpc(NetworkObjectReference cellReference, int i, int j, int width, int height)
+        {
+            cellReference.TryGet(out var cellObj);
+            SpawnBorderWalls(cellObj.GetComponent<Cell>(), i, j, width, height);
+        }
         private void SpawnBorderWalls(Cell cell, int i, int j, int width, int height)
         {
             if (i == width - 1 && cell.wallLeft != null)
@@ -237,7 +324,7 @@ namespace Maze
         {
             if (PrefabUtility.IsPartOfPrefabAsset(prefabInstance))
             {
-                Debug.LogError("Пытаетесь изменить оригинальный префаб! Используйте Instantiate.");
+                Debug.LogError("пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ! пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ Instantiate.");
                 return;
             }
             Renderer rend = prefabInstance.GetComponent<Renderer>();
@@ -271,13 +358,13 @@ namespace Maze
             RaycastHit hit;
             if (Physics.Raycast(rayStart, Vector3.down, out hit, rayLength))
             {
-                // Смещение от центра до нижней грани
+                // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
                 float bottomOffset = bounds.center.y - bounds.min.y;
                 obj.transform.position = hit.point + new Vector3(0, bottomOffset, 0);
             }
             else
             {
-                Debug.LogWarning($"Объект {obj.name} не приземлился!");
+                Debug.LogWarning($"пїЅпїЅпїЅпїЅпїЅпїЅ {obj.name} пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ!");
             }
         }
     }
