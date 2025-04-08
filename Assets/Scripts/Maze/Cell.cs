@@ -20,6 +20,7 @@ namespace Maze
         public GameObject lever;
 
         public List<WeightedPrefab> walls;
+        public List<WeightedPrefab> items;
     }
 
 }

@@ -51,7 +51,7 @@ namespace Maze
 
                     if (cells[i, j].replaceableLeft)
                     {
-                        SpawnCellObjects(cell, "Wall Left");
+                        SpawnCellObjects(cell, "Wall Left", cell.walls);
                     } else
                     {
                         SpawnObjectsOnWall(cell.wallLeft, "ObjectOnWall1");
@@ -60,12 +60,15 @@ namespace Maze
 
                     if (cells[i, j].replaceableBottom)
                     {
-                        SpawnCellObjects(cell, "Wall Bottom");
+                        SpawnCellObjects(cell, "Wall Bottom", cell.walls);
                     } else
                     {
                         SpawnObjectsOnWall(cell.wallBottom, "ObjectOnWall1");
                         SpawnObjectsOnWall(cell.wallBottom, "ObjectOnWall2");
                     }
+
+                    SpawnCellObjects(cell, "ItemSlot1", cell.items);
+                    SpawnCellObjects(cell, "ItemSlot2", cell.items);
 
                     cell.doorLeft.SetActive(cells[i, j].doorLeft);
                     cell.doorBottom.SetActive(cells[i, j].doorBottom);
@@ -87,12 +90,12 @@ namespace Maze
             }
         }
 
-        private void SpawnCellObjects(Cell cell, string objectName)
+
+        private void SpawnCellObjects(Cell cell, string objectName, List<WeightedPrefab> objList, bool scale=true)
         {
             Transform wallSlot = cell.transform.Find(objectName);
-
-            // GameObject wallObject = cell.walls[UnityEngine.Random.Range(0, cell.walls.Count)];
-            GameObject wallObject = GetRandomPrefab(cell.walls);
+            Debug.Log($"Spawning in {objectName}");
+            GameObject wallObject = GetRandomPrefab(objList);
             if (wallObject == null)
             {
                 return;
@@ -101,23 +104,45 @@ namespace Maze
             if (wallSlot.childCount > 0)
                 Destroy(wallSlot.GetChild(0).gameObject);
 
+            //GameObject spawnedObj = Instantiate(wallObject, wallSlot);
+            //ApplyRandomTransform(spawnedObj.transform);
+
             GameObject spawnedObj = Instantiate(wallObject, wallSlot);
+            Debug.Log($"My position is {spawnedObj.transform.localPosition}");
+            // spawnedObj.transform.localPosition = Vector3.zero; // Сбрасываем позицию
+            // spawnedObj.transform.localRotation = Quaternion.identity; // Сбрасываем поворот
             ApplyRandomTransform(spawnedObj.transform);
-            AdjustPrefabScale(wallObject);
-            SnapToGroundWithRaycast(wallObject);
+
+            if (scale)
+            {
+                AdjustPrefabScale(spawnedObj);
+            }
+            // SnapToGroundWithRaycast(spawnedObj);
         }
 
         private void ApplyRandomTransform(Transform targetTransform)
         {
-            float randomYRotation = Random.Range(-30f, 30f);
-            targetTransform.Rotate(0f, randomYRotation, 0f, Space.Self);
+            if (PrefabUtility.IsPartOfPrefabAsset(targetTransform))
+            {
+                Debug.LogError("Пытаетесь изменить оригинальный префаб! Используйте Instantiate.");
+                return;
+            }
+            Vector3 originalPosition = targetTransform.position;
+            Quaternion originalRotation = targetTransform.rotation;
 
-            float randomXOffset = Random.Range(-1f, 1f);
-            float randomZOffset = Random.Range(-1f, 1f);
-            targetTransform.Translate(randomXOffset, 0f, randomZOffset, Space.Self);
+            float randomYRotation = Random.Range(-30f, 30f);
+            targetTransform.Rotate(0f, randomYRotation, 0f, Space.World);
+
+            Vector3 localOffset = new Vector3(
+                Random.Range(-1f, 1f),
+                0,
+                Random.Range(-1f, 1f)
+            );
+
+            targetTransform.localPosition += localOffset;
         }
 
-        private void SpawnObjectsOnWall(GameObject wallHolder, string objectName)
+            private void SpawnObjectsOnWall(GameObject wallHolder, string objectName)
         {
             if (wallHolder == null)
             {
@@ -185,6 +210,11 @@ namespace Maze
 
         private void AdjustPrefabScale(GameObject prefabInstance, float minSize = 0.84f)
         {
+            if (PrefabUtility.IsPartOfPrefabAsset(prefabInstance))
+            {
+                Debug.LogError("Пытаетесь изменить оригинальный префаб! Используйте Instantiate.");
+                return;
+            }
             Renderer rend = prefabInstance.GetComponent<Renderer>();
             if (rend == null)
             {
@@ -210,14 +240,19 @@ namespace Maze
             if (renderer == null) return;
 
             Bounds bounds = renderer.bounds;
-            float rayLength = 10f;
-            Vector3 rayStart = obj.transform.position + Vector3.up * 2f;
+            Vector3 rayStart = bounds.center;
+            float rayLength = bounds.extents.y + 2f;
 
             RaycastHit hit;
             if (Physics.Raycast(rayStart, Vector3.down, out hit, rayLength))
             {
-                float bottomOffset = bounds.min.y - obj.transform.position.y;
-                obj.transform.position = hit.point - new Vector3(0, bottomOffset, 0);
+                // Смещение от центра до нижней грани
+                float bottomOffset = bounds.center.y - bounds.min.y;
+                obj.transform.position = hit.point + new Vector3(0, bottomOffset, 0);
+            }
+            else
+            {
+                Debug.LogWarning($"Объект {obj.name} не приземлился!");
             }
         }
     }
