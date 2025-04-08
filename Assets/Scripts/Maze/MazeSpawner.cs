@@ -140,9 +140,34 @@ namespace Maze
             );
 
             targetTransform.localPosition += localOffset;
+            //if (IsCollidingWithAnything(targetTransform))
+            //{
+            //    targetTransform.position = originalPosition;
+            //    targetTransform.rotation = originalRotation;
+            //}
         }
 
-            private void SpawnObjectsOnWall(GameObject wallHolder, string objectName)
+        private bool IsCollidingWithAnything(Transform target)
+        {
+            Collider[] myColliders = target.GetComponentsInChildren<Collider>();
+
+            foreach (Collider myCollider in myColliders)
+            {
+                Collider[] overlappingColliders = Physics.OverlapBox(
+                    myCollider.bounds.center,
+                    myCollider.bounds.extents,
+                    myCollider.transform.rotation
+                );
+
+                if (overlappingColliders.Length > 1) // >1, потому что сам объект тоже попадает в массив
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private void SpawnObjectsOnWall(GameObject wallHolder, string objectName)
         {
             if (wallHolder == null)
             {
