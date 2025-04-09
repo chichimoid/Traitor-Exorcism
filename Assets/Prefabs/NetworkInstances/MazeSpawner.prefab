@@ -78,3 +78,4 @@ MonoBehaviour:
   cellSize: {x: 5, y: 0, z: 5}
   doorPrefab: {fileID: 1402758661513540240, guid: ac87eb11b8e97b1448caade07fb24f47, type: 3}
   leverPrefab: {fileID: 1577609632647162967, guid: 9befcb486581cd7458e005c1d94f893d, type: 3}
+  wallPrefab: {fileID: 4850725897767855395, guid: 679d01f1663ad0c4f9b644f3b3d61f91, type: 3}

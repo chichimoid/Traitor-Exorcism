@@ -71,7 +71,3 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  votingCircleCenter: {x: 0, y: 0}
-  votingCircleRadius: 4
-  votingDisplayerSpawnerPrefab: {fileID: 4025596065621696896, guid: 1af4839efeb9f264e855117eadfd092b, type: 3}
-  voteManagerPrefab: {fileID: 3333724901077375710, guid: da1fa339fb9e07e42893d28f1a12837a, type: 3}
