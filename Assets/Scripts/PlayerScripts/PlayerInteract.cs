@@ -21,8 +21,7 @@ namespace PlayerScripts
         private InputAction _drop;
         private InputAction _swap;
         private PlayerRayCaster _rayCaster;
-
-        public NetworkPlayer NetworkPlayer => _networkPlayer;
+        
         public float InteractionRange => interactionRange;
         public Transform HoldPointTransformMain => holdPointTransformMain;
         public Transform HoldPointTransformSecond => holdPointTransformSecond;
@@ -67,7 +66,7 @@ namespace PlayerScripts
             {
                 if (hit.collider.TryGetComponent(out IInteractable interactable) && interactable.CanInteract())
                 {
-                    if (interactable is IGrabbable grabbable)
+                    if (interactable is Grabbable grabbable)
                     {
                         if (_networkPlayer.HeldObjMain is not null && _networkPlayer.HeldObjSecond is not null)
                         {

@@ -53,9 +53,35 @@ namespace PlayerScripts
         }
 
         public PlayerRole Role { get => _role.Value; set => _role.Value = value; }
+
+        private Grabbable _heldObjMain;
+        private Grabbable _heldObjSecond;
+
+        [CanBeNull]
+        public Grabbable HeldObjMain
+        {
+            get => _heldObjMain;
+            set => SyncMainHeldObjRpc(value?.GetComponent<NetworkObject>());
+        }
+        public Grabbable HeldObjSecond
+        {
+            get => _heldObjSecond;
+            set => SyncSecondHeldObjRpc(value?.GetComponent<NetworkObject>());
+        }
+
+        [Rpc(SendTo.Everyone)]
+        private void SyncMainHeldObjRpc(NetworkObjectReference objReference)
+        {
+            objReference.TryGet(out var heldObj);
+            _heldObjMain = heldObj.GetComponent<Grabbable>();
+        }
         
-        [CanBeNull] public IGrabbable HeldObjMain { get; set; }
-        [CanBeNull] public IGrabbable HeldObjSecond { get; set; }
+        [Rpc(SendTo.Everyone)]
+        private void SyncSecondHeldObjRpc(NetworkObjectReference objReference)
+        {
+            objReference.TryGet(out var heldObj);
+            _heldObjSecond = heldObj.GetComponent<Grabbable>();
+        }
 
 
         private void Start()

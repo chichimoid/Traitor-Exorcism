@@ -14,14 +14,14 @@ namespace ObjectScripts
                 Debug.Log("Pills is over...");
                 return;
             }
-            if (player.GetComponent<PlayerHealth>().Infection == 0)
+            if (Player.GetComponent<PlayerHealth>().Infection == 0)
             {
-                Debug.Log("Вы полностью здоровы! Поберегите таблетки.");
+                Debug.Log("пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ! пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.");
                 return;
             }
-            player.GetComponent<PlayerHealth>().InflictInfection(-10); 
+            Player.GetComponent<PlayerHealth>().InflictInfection(-10); 
             _count--;
-            Debug.Log($"Current infection: {player.GetComponent<PlayerHealth>().Infection}. Осталось использований: {_count}");
+            Debug.Log($"Current infection: {Player.GetComponent<PlayerHealth>().Infection}. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: {_count}");
         }
     }
 }

@@ -14,14 +14,14 @@ namespace ObjectScripts
                 Debug.Log("Aptechka is over...");
                 return;
             }
-            if(player.GetComponent<PlayerHealth>().Health == player.GetComponent<PlayerHealth>().MaxHealth)
+            if(Player.GetComponent<PlayerHealth>().Health == Player.GetComponent<PlayerHealth>().MaxHealth)
             {
                 Debug.Log("You have a full health! ������� ���� �������!");
                 return;
             }
-            player.GetComponent<PlayerHealth>().RegenHealth(20);
+            Player.GetComponent<PlayerHealth>().RegenHealth(20);
             _count--;
-            Debug.Log($"Current health: {player.GetComponent<PlayerHealth>().Health}. �������� �������������: {_count}");
+            Debug.Log($"Current health: {Player.GetComponent<PlayerHealth>().Health}. �������� �������������: {_count}");
         }
     }
 }

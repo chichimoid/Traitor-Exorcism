@@ -11,7 +11,7 @@ namespace ObjectScripts
         private Rigidbody _objectRigidbody;
         private Collider _objectCollider;
         private bool _canInteract = true;
-        public Transform player; 
+        public Transform Player { get; private set; } = null;
 
         private void Awake()
         {
@@ -25,52 +25,41 @@ namespace ObjectScripts
         }
         public void Interact(Transform interactor)
         {
-            GrabbableSetFollowTransformServerRpc(interactor.GetComponent<NetworkObject>());
-            player = interactor;
-            // Functional();
+            InteractRpc(interactor.GetComponent<NetworkObject>());
         }
 
-        // protected abstract void Functional();
-
-        [ServerRpc(RequireOwnership = false)]
-        public void GrabbableSetFollowTransformServerRpc(NetworkObjectReference parentReference)
-        {
-            GrabbableSetFollowTransformClientRpc(parentReference);
-        }
-
-        [ClientRpc]
-        private void GrabbableSetFollowTransformClientRpc(NetworkObjectReference parentReference)
+        [Rpc(SendTo.Everyone)]
+        private void InteractRpc(NetworkObjectReference parentReference)
         {
             _canInteract = false;
             _objectRigidbody.isKinematic = true;
             _objectCollider.isTrigger = true;
 
             parentReference.TryGet(out NetworkObject parent);
-            if (parent.GetComponent<PlayerInteract>().NetworkPlayer.HeldObjSecond is not null)
+            if (parent.GetComponent<NetworkPlayer>().HeldObjSecond is not null)
             {
                 FollowTransformManager.Instance.Follow(transform, parent.GetComponent<PlayerInteract>().HoldPointTransformSecond);
                 return;
             }
             FollowTransformManager.Instance.Follow(transform, parent.GetComponent<PlayerInteract>().HoldPointTransformMain);
+            
+            Player = parent.transform;
         }
 
         public void Drop()
         {
-            DropServerRpc();
-        }
-        [ServerRpc(RequireOwnership = false)]
-        private void DropServerRpc()
-        {
-            DropClientRpc();
+            DropRpc();
         }
 
-        [ClientRpc]
-        private void DropClientRpc()
+        [Rpc(SendTo.Everyone)]
+        private void DropRpc()
         {
-            _objectRigidbody.isKinematic = false;
-            _objectCollider.isTrigger = false;
+            Player = null;
 
             FollowTransformManager.Instance.Unfollow(transform);
+            
+            _objectRigidbody.isKinematic = false;
+            _objectCollider.isTrigger = false;
             _canInteract = true;
         }
     }

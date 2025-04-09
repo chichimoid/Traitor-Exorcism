@@ -90,7 +90,7 @@ namespace PlayerScripts
         {
             yield return new WaitForSeconds(regenDelay);
 
-            while (Health < 100f)
+            while (Health < maxHealth)
             {
                 Health += regenValue;
                 GlobalDebugger.Instance.Log($"Player {NetworkManager.Singleton.LocalClientId} health changed: {Health}");

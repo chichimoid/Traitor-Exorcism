@@ -40,7 +40,7 @@ namespace PlayerScripts
 
         private void Use(InputAction.CallbackContext context)
         {
-            if (_networkPlayer.HeldObjMain is IUsable usable) {
+            if (_networkPlayer.HeldObjMain is Usable usable) {
                 usable.Use();
                 Debug.Log("Used");
             }
