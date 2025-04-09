@@ -65,7 +65,7 @@ namespace Maze
 
                     if (cells[i, j].replaceableLeft)
                     {
-                        SpawnCellObjects(cell, "Wall Left", cell.walls, false, false);
+                        SpawnCellObjects(cell, "Wall Left", cell.walls, false, true);
                     } else
                     {
                         SpawnObjectsOnWall(cell.wallLeft, "ObjectOnWall1");
@@ -74,7 +74,7 @@ namespace Maze
 
                     if (cells[i, j].replaceableBottom)
                     {
-                        SpawnCellObjects(cell, "Wall Bottom", cell.walls, false, false);
+                        SpawnCellObjects(cell, "Wall Bottom", cell.walls, false, true);
                     } else
                     {
                         SpawnObjectsOnWall(cell.wallBottom, "ObjectOnWall1");
@@ -84,7 +84,7 @@ namespace Maze
                     SpawnCellObjects(cell, "ItemSlot1", cell.items, false, false);
                     SpawnCellObjects(cell, "ItemSlot2", cell.items, false, false);
 
-                    if (cells[i, j].doorLeft)
+                    if (cells[i, j].doorLeft && cells[i, j].replaceableLeft)
                     {
                         var spawnedObj = Instantiate(doorPrefab, cell.doorLeft.transform.position, cell.doorLeft.transform.rotation);
                         spawnedObj.transform.localScale = cell.doorLeft.transform.localScale;
@@ -95,7 +95,7 @@ namespace Maze
                         Destroy(cell.doorLeft);
                     }
                     
-                    if (cells[i, j].doorBottom)
+                    if (cells[i, j].doorBottom && cells[i, j].replaceableBottom)
                     {
                         var spawnedObj = Instantiate(doorPrefab, cell.doorBottom.transform.position, cell.doorBottom.transform.rotation);
                         spawnedObj.transform.localScale = cell.doorBottom.transform.localScale;
