@@ -150,7 +150,7 @@ namespace Maze
             floorRender.material.color = _zoneColors[cells[i, j].zone];
         }
         
-        private void SpawnCellObjects(Cell cell, string objectName, List<WeightedPrefab> objList, bool scale=true, bool spawnAsChild = true)
+        private void SpawnCellObjects(Cell cell, string objectName, List<WeightedPrefab> objList, bool scale = true, bool spawnAsChild = true)
         {
             Transform wallSlot = cell.transform.Find(objectName);
             Debug.Log($"Spawning in {objectName}");

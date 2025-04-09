@@ -4,19 +4,35 @@ using NetworkHelperScripts;
 using PlayerScripts;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Voting
 {
-    public class VotingConcluder : NetworkBehaviour
+    public class VotingPhaseEnder : NetworkBehaviour
     {
-        public static VotingConcluder Instance { get; private set; }
+        [SerializeField] private ServerTimer serverTimer;
 
-        private void Awake()
+        private void Start()
         {
-            Instance = this;
+            serverTimer.OnTimeUp += End;
         }
         
-        public ulong GetPlayerToKickId()
+        private void End()
+        {
+            var playerToKickId = GetPlayerToKickId();
+            if (playerToKickId == GameManager.Instance.GetMonsterId())
+            {
+                GlobalDebugger.Instance.Log($"Player {playerToKickId} was indeed the monster.");
+            }
+            else
+            {
+                GlobalDebugger.Instance.Log($"Player {playerToKickId} was not the monster.");
+            }
+            
+            GameManager.Instance.StartAftermath();
+        }
+        
+        private ulong GetPlayerToKickId()
         {
             var maxVotesPlayersIds = GetMaxVotesPlayersIds();
             var playerToKickIdIndex = Random.Range(0, maxVotesPlayersIds.Count);

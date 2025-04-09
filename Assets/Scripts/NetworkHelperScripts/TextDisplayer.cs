@@ -4,7 +4,7 @@ using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
-public class TextHelper : NetworkBehaviour
+public class TextDisplayer : NetworkBehaviour
 {
     [SerializeField] private TMP_Text textField;
     private string _prevText;

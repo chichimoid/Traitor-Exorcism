@@ -5,21 +5,18 @@ using UnityEngine;
 
 namespace Maze
 {
-    public class MazeManager : NetworkBehaviour
+    public class MazeSceneInitializer : NetworkBehaviour
     {
+        [Header("Configure")]
         [SerializeField] private int width;
         [SerializeField] private int length;
+        [Header("References")]
+        [SerializeField] private Phase1Initializer phase1Initializer;
+        [Header("Prefabs")]
         [SerializeField] private Transform mazeSpawnerPrefab;
         
         private readonly NetworkVariable<MazeData> _mazeData = new();
         public MazeData MazeData => _mazeData.Value;
-    
-        public static MazeManager Instance { get; private set; }
-    
-        private void Awake()
-        {
-            Instance = this;
-        }
         
         private readonly NetworkVariable<int> _spawnedPlayers = new(0);
         
@@ -57,6 +54,8 @@ namespace Maze
             var spawnedObj = Instantiate(mazeSpawnerPrefab);
             spawnedObj.GetComponent<NetworkObject>().Spawn(true);
             spawnedObj.GetComponent<MazeSpawner>().SpawnMaze(_mazeData.Value);
+            
+            phase1Initializer.StartPhase1();
             
             FinishSpawnRpc();
         }

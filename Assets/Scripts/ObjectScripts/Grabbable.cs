@@ -23,6 +23,7 @@ namespace ObjectScripts
         {
             return _canInteract;
         }
+        
         public void Interact(Transform interactor)
         {
             InteractRpc(interactor.GetComponent<NetworkObject>());

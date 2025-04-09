@@ -76,7 +76,7 @@ namespace PlayerScripts
             var playerUI = tr.GetComponent<PlayerUI>();
             
             var emoteWheelUI = playerUI.EmoteWheelUI.GetComponent<EmoteWheelUI>();
-            var helper = GetComponent<TextHelper>();
+            var helper = GetComponent<TextDisplayer>();
             foreach (var emoteButton in emoteWheelUI.EmoteButtons)
             {
                 // This is very ugly due to proper emotes being absent.

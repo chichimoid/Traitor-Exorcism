@@ -23,7 +23,7 @@ namespace Maze
     
     public class GameManager : NetworkBehaviour
     {
-        public GamePhase Phase { get; private set; }= GamePhase.None;
+        public GamePhase Phase { get; private set; } = GamePhase.None;
         public static GameManager Instance { get; private set; }
 
         private void Awake()
@@ -93,6 +93,7 @@ namespace Maze
         /// <summary>
         /// The voting phase.
         /// All players vote for who they think is the monster.
+        /// The chosen player gets kicked and players see if they were right.
         /// </summary>
         public void StartVoting()
         {
@@ -108,29 +109,18 @@ namespace Maze
         }
         
         /// <summary>
-        /// The conclusion phase.
-        /// The chosen player gets kicked and players see if they were right.
-        /// Possible aftermath (some game over scene etc.).
+        /// The aftermath phase.
+        /// Some game over scene etc.
         /// </summary>
-        public void Conclude()
+        public void StartAftermath()
         {
             if (!IsServer) return;
             
-            if (Phase != GamePhase.Voting) throw new Exception($"Conclusion can only start after Voting. Active phase is {Phase}");
+            if (Phase != GamePhase.Voting) throw new Exception($"Aftermath can only start after Voting. Active phase is {Phase}");
             
             Phase = GamePhase.Conclusion;
             
-            Debug.Log("Concluding...");
-            
-            var playerToKickId = VotingConcluder.Instance.GetPlayerToKickId();
-            if (playerToKickId == GetMonsterId())
-            {
-                GlobalDebugger.Instance.Log($"Player {playerToKickId} was indeed the monster.");
-            }
-            else
-            {
-                GlobalDebugger.Instance.Log($"Player {playerToKickId} was not the monster.");
-            }
+            Debug.Log("Starting aftermath...");
             
             // TBA: Some aftermath.
         }

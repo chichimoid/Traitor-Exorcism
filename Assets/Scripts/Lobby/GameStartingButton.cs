@@ -8,18 +8,18 @@ namespace Lobby
     public class GameStartingButton : NetworkBehaviour, IInteractable
     {
         [SerializeField] private string clientAttemptMsg;
-        private TextHelper _textHelper;
+        private TextDisplayer _textDisplayer;
         
         private void Awake()
         {
-            _textHelper = GetComponent<TextHelper>();
+            _textDisplayer = GetComponent<TextDisplayer>();
         }
         
         public void Interact(Transform player)
         {
             if (!IsServer)
             {
-                _textHelper.TempDisplayText32Chars(clientAttemptMsg);
+                _textDisplayer.TempDisplayText32Chars(clientAttemptMsg);
                 return;
             }
             

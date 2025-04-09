@@ -1,50 +1,35 @@
 ﻿using System;
+using NetworkHelperScripts;
 using PlayerScripts;
 using Unity.Netcode;
-using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Voting
 {
-    public class VotingInitializer : NetworkBehaviour
+    public class VotingPhaseInitializer : NetworkBehaviour
     {
         [Header("Configure")] 
         [SerializeField] private Vector2 votingCircleCenter;
         [SerializeField] private float votingCircleRadius;
         [SerializeField] private Vector3 voteDisplayerLocalSpawnOffset;
+        [SerializeField] private int votingTimeSeconds;
+
+        [FormerlySerializedAs("timer")]
         [Header("References")]
-        [SerializeField] private Transform votingDisplayerSpawnerPrefab;
+        [SerializeField] private ServerTimer serverTimer;
+        
+        [Header("Prefabs")]
         [SerializeField] private Transform voteManagerPrefab;
         [SerializeField] private Transform voteDisplayerPrefab;
 
-        private readonly NetworkVariable<int> _spawnedPlayers = new(0);
-        
-        public override void OnNetworkSpawn()
-        {
-            base.OnNetworkSpawn();
-            
-            PlayerSpawnedServerRpc();
-        }
-
-        [Rpc(SendTo.Server)]
-        public void PlayerSpawnedServerRpc()
-        {
-            ++_spawnedPlayers.Value;
-
-            if (_spawnedPlayers.Value == NetworkManager.Singleton.ConnectedClients.Count)
-            {
-                StartVotingServerRpc();
-            }
-        }
-        
-        [Rpc(SendTo.Server)]
-        private void StartVotingServerRpc()
+        public void StartVotingPhase()
         {
             var len = NetworkManager.Singleton.ConnectedClients.Count;
             var spawnedNetworkObject = Instantiate(voteManagerPrefab).GetComponent<NetworkObject>();
             spawnedNetworkObject.Spawn(true);
             
-            VotingTimer.Instance.StartTimer();
+            serverTimer.StartTimer(votingTimeSeconds);
             
             for (int i = 0; i < len; i++)
             {
@@ -73,14 +58,18 @@ namespace Voting
 
         private void TeleportPlayerToVotingCircle(NetworkObject playerObject, int i, int len)
         {
-            var playerRb = playerObject.GetComponent<Rigidbody>();
-            playerRb.useGravity = false;
+            PlayerLocker.Instance.LockRotation();
+            PlayerLocker.Instance.LockPhysics();
+
 
             var playerPointOnVotingCircle = GetPlayerPointOnVotingCircle(i, len);
+            var playerRb = playerObject.GetComponent<Rigidbody>();
             playerRb.position = new Vector3(playerPointOnVotingCircle.x, playerRb.position.y, playerPointOnVotingCircle.y);
             playerObject.transform.LookAt(new Vector3(votingCircleCenter.x, playerObject.transform.position.y, votingCircleCenter.y));
+            
+            PlayerLocker.Instance.UnlockPhysics();
+            PlayerLocker.Instance.UnlockRotation();
 
-            playerRb.useGravity = true;
         }
 
         private Vector2 GetPlayerPointOnVotingCircle(int i, int len)

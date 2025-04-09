@@ -442,7 +442,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  meshObject: {fileID: 0}
+  <MeshObject>k__BackingField: {fileID: 1420599323856099072}
 --- !u!114 &6262159336189016517
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -906,7 +906,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2967216200531195706}
   m_Layer: 0
-  m_Name: Head
+  m_Name: HeadPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

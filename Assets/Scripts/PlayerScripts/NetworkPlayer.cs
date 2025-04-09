@@ -21,13 +21,11 @@ namespace PlayerScripts
     }
     public class NetworkPlayer : NetworkBehaviour
     {
-        [SerializeField] private GameObject meshObject;
-        
         private readonly NetworkVariable<ulong> _id = new(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         private readonly NetworkVariable<PlayerState> _state = new(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         private readonly NetworkVariable<PlayerRole> _role = new(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
-        public GameObject MeshObject => meshObject;
+        [field:SerializeField] public GameObject MeshObject { get; private set; }
         public ulong Id { get => _id.Value; private set => _id.Value = value; }
 
         public PlayerState State
@@ -72,14 +70,22 @@ namespace PlayerScripts
         [Rpc(SendTo.Everyone)]
         private void SyncMainHeldObjRpc(NetworkObjectReference objReference)
         {
-            objReference.TryGet(out var heldObj);
+            if (!objReference.TryGet(out var heldObj))
+            {
+                _heldObjMain = null;
+                return;
+            }
             _heldObjMain = heldObj.GetComponent<Grabbable>();
         }
         
         [Rpc(SendTo.Everyone)]
         private void SyncSecondHeldObjRpc(NetworkObjectReference objReference)
         {
-            objReference.TryGet(out var heldObj);
+            if (!objReference.TryGet(out var heldObj))
+            {
+                _heldObjSecond = null;
+                return;
+            }
             _heldObjSecond = heldObj.GetComponent<Grabbable>();
         }
 
