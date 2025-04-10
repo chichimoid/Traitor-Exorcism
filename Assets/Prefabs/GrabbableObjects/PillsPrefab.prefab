@@ -31,8 +31,8 @@ Transform:
   m_GameObject: {fileID: 1985338178271116}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0.66371346, z: -0, w: -0.747987}
-  m_LocalPosition: {x: 0.1292, y: 0.10242002, z: -0.0832}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0.1292, y: 0.086692, z: -0.0832}
+  m_LocalScale: {x: 2.096, y: 2.096, z: 2.096}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -129,7 +129,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   grabbableSO: {fileID: 11400000, guid: 29fdff3eab372c540926cea8890be2d8, type: 2}
-  player: {fileID: 0}
 --- !u!65 &3751979868914298580
 BoxCollider:
   m_ObjectHideFlags: 0
