@@ -67,12 +67,12 @@ namespace Maze
 
                     if (!cells[i, j].wallLeft)
                     {
-                        DestroyWallRpc(cell.GetComponent<NetworkObject>(), true);
+                        DestroyWallRpc(cell.GetComponent<NetworkObject>(), WallHolder.Left);
                     }
 
                     if (!cells[i, j].wallBottom)
                     {
-                        DestroyWallRpc(cell.GetComponent<NetworkObject>(), false);
+                        DestroyWallRpc(cell.GetComponent<NetworkObject>(), WallHolder.Bottom);
                     }
 
                     Maze.Wall leftWallObj = cell.wallLeft.GetComponent<Maze.Wall>();
@@ -146,11 +146,13 @@ namespace Maze
         /// true = wallLeft, false = wallBottom
         /// </param>
         [Rpc(SendTo.Everyone)]
-        private void DestroyWallRpc(NetworkObjectReference cellReference, bool leftWall)
+        private void DestroyWallRpc(NetworkObjectReference cellReference, WallHolder wallEnum)
         {
             cellReference.TryGet(out var cellObj);
             var cell = cellObj.GetComponent<Cell>();
-            Destroy(leftWall ? cell.wallLeft : cell.wallBottom);
+            // Destroy(leftWall ? cell.wallLeft : cell.wallBottom);
+
+            Destroy(GetWallHolderFromEnum(cell, wallEnum));
         }
 
         [Rpc(SendTo.Everyone)]
