@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using UnityEngine;
 using System.Collections.Generic;
+using Unity.Netcode;
 
 namespace Maze
 {
@@ -22,5 +23,4 @@ namespace Maze
         public List<WeightedPrefab> walls;
         public List<WeightedPrefab> items;
     }
-
 }

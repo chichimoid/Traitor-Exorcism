@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Netcode;
@@ -7,6 +8,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UIElements;
 using static Unity.Cinemachine.CinemachineSplineRoll;
+using Random = UnityEngine.Random;
 
 namespace Maze
 {
@@ -28,7 +30,19 @@ namespace Maze
             Color.yellow,
             Color.cyan,
         };
-    
+
+        private enum CellObjectList
+        {
+            Walls,
+            Items
+        }
+        
+        private enum WallHolder
+        {
+            Left,
+            Bottom
+        }
+        
         public static MazeSpawner Instance { get; private set; }
 
         private void Awake()
@@ -61,29 +75,29 @@ namespace Maze
                         DestroyWallRpc(cell.GetComponent<NetworkObject>(), false);
                     }
 
-                    Wall leftWallObj = cell.wallLeft.GetComponent<Wall>();
-                    Wall bottomWallObj = cell.wallBottom.GetComponent<Wall>();
+                    Maze.Wall leftWallObj = cell.wallLeft.GetComponent<Maze.Wall>();
+                    Maze.Wall bottomWallObj = cell.wallBottom.GetComponent<Maze.Wall>();
 
                     if (cells[i, j].replaceableLeft)
                     {
-                        SpawnCellObjects(cell, "Wall Left", cell.walls, false, true);
+                        SpawnCellObjects(cell, "Wall Left", CellObjectList.Walls, false);
                     } else
                     {
-                        SpawnObjectsOnWall(cell.wallLeft, "ObjectOnWall1");
-                        SpawnObjectsOnWall(cell.wallLeft, "ObjectOnWall2");
+                        SpawnObjectsOnWall(cell, WallHolder.Left, "ObjectOnWall1");
+                        SpawnObjectsOnWall(cell, WallHolder.Left, "ObjectOnWall2");
                     }
 
                     if (cells[i, j].replaceableBottom)
                     {
-                        SpawnCellObjects(cell, "Wall Bottom", cell.walls, false, true);
+                        SpawnCellObjects(cell, "Wall Bottom", CellObjectList.Walls, false);
                     } else
                     {
-                        SpawnObjectsOnWall(cell.wallBottom, "ObjectOnWall1");
-                        SpawnObjectsOnWall(cell.wallBottom, "ObjectOnWall2");
+                        SpawnObjectsOnWall(cell, WallHolder.Bottom, "ObjectOnWall1");
+                        SpawnObjectsOnWall(cell, WallHolder.Bottom, "ObjectOnWall2");
                     }
 
-                    SpawnCellObjects(cell, "ItemSlot1", cell.items, false, false);
-                    SpawnCellObjects(cell, "ItemSlot2", cell.items, false, false);
+                    SpawnCellObjects(cell, "ItemSlot1", CellObjectList.Items, false, false);
+                    SpawnCellObjects(cell, "ItemSlot2", CellObjectList.Items, false, false);
 
                     if (cells[i, j].doorLeft && cells[i, j].replaceableLeft)
                     {
@@ -151,11 +165,14 @@ namespace Maze
             floorRender.material.color = _zoneColors[cells[i, j].zone];
         }
         
-        private void SpawnCellObjects(Cell cell, string objectName, List<WeightedPrefab> objList, bool scale = true, bool spawnAsChild = true)
+        private void SpawnCellObjects(Cell cell, string objectName, CellObjectList objListEnum, bool scale = true, bool spawnAsChild = true)
         {
+            List<WeightedPrefab> objList = GetCellObjectListFromEnum(cell, objListEnum);
+            
             Transform wallSlot = cell.transform.Find(objectName);
             Debug.Log($"Spawning in {objectName}");
-            GameObject wallObject = GetRandomPrefab(objList);
+            int wallObjectIndex = GetRandomPrefabIndex(objList);
+            var wallObject = objList[wallObjectIndex].prefab;
             if (wallObject == null)
             {
                 return;
@@ -166,17 +183,32 @@ namespace Maze
 
             //GameObject spawnedObj = Instantiate(wallObject, wallSlot);
             //ApplyRandomTransform(spawnedObj.transform);
-
-            GameObject spawnedObj;
+            
             if (spawnAsChild)
             {
-                spawnedObj = Instantiate(wallObject, wallSlot);
+                SpawnCellObjectsRpc(cell.GetComponent<NetworkObject>(), objListEnum, objectName, wallObjectIndex);
             }
             else
             {
-                spawnedObj = Instantiate(wallObject, wallSlot.transform.position, wallSlot.transform.rotation);
+                var spawnedObj = Instantiate(wallObject, wallSlot.transform.position, wallSlot.transform.rotation);
                 AlignToPlaceholder(wallSlot, spawnedObj);
+                spawnedObj.GetComponent<NetworkObject>().Spawn(true);
             }
+        }
+        
+        [Rpc(SendTo.Everyone)]
+        private void SpawnCellObjectsRpc(NetworkObjectReference cellReference, CellObjectList objListEnum, FixedString64Bytes objectName64Bytes, int wallObjectIndex, bool scale = true)
+        {
+            cellReference.TryGet(out var cellObj);
+            var cell = cellObj.GetComponent<Cell>();
+            
+            var objList = GetCellObjectListFromEnum(cell, objListEnum);
+            
+            string objectName = objectName64Bytes.ToString();
+            Transform wallSlot = cell.transform.Find(objectName);
+            var wallObject = objList[wallObjectIndex].prefab;
+            var spawnedObj = Instantiate(wallObject, wallSlot);
+            
             Debug.Log($"My position is {spawnedObj.transform.localPosition}");
             ApplyRandomTransform(spawnedObj.transform);
 
@@ -185,11 +217,18 @@ namespace Maze
                 AdjustPrefabScale(spawnedObj);
             }
             // SnapToGroundWithRaycast(spawnedObj);
+        }
 
-            if (!spawnAsChild)
+        private List<WeightedPrefab> GetCellObjectListFromEnum(Cell cell, CellObjectList objListEnum)
+        {
+            List<WeightedPrefab> objList = objListEnum switch
             {
-                spawnedObj.GetComponent<NetworkObject>().Spawn(true);
-            }
+                CellObjectList.Walls => cell.walls,
+                CellObjectList.Items => cell.items,
+                _ => null
+            };
+            if (objList == null) throw new ArgumentException("Invalid enum member");
+            return objList;
         }
 
         void AlignToPlaceholder(Transform placeholder, GameObject targetObj, bool rotate = false)
@@ -274,31 +313,60 @@ namespace Maze
             return false;
         }
 
-        private void SpawnObjectsOnWall(GameObject wallHolder, string objectName)
+        private void SpawnObjectsOnWall(Cell cell, WallHolder wallHolderEnum, string objectName)
         {
+            var wallHolder = GetWallHolderFromEnum(cell, wallHolderEnum);
+            
             if (wallHolder == null)
             {
                 Debug.Log("Wallholder is null");
                 return;
             }
 
-            Wall wall = wallHolder.GetComponentInChildren<Wall>(true);
+            Maze.Wall wall = wallHolder.GetComponentInChildren<Maze.Wall>(true);
             if (wall == null)
             {
                 Debug.Log("Wall is none");
                 return;
             }
 
-            Transform wallSlot = wall.transform.Find(objectName);
-
-            GameObject wallObject = GetRandomPrefab(wall.ObjectsOnWalls);
+            int wallObjectIndex = GetRandomPrefabIndex(wall.ObjectsOnWalls);
+            var wallObject = wall.ObjectsOnWalls[wallObjectIndex].prefab;
+            
             if (wallObject == null)
             {
                 return;
             }
-            var spawnedObj = Instantiate(wallObject, wallSlot.transform.position, wallSlot.transform.rotation);
-            AlignToPlaceholder(wallSlot, spawnedObj, true);
-            spawnedObj.GetComponent<NetworkObject>().Spawn(true);
+            
+            InstantiateObjectsOnWallsRpc(cell.GetComponent<NetworkObject>(), wallHolderEnum, wallObjectIndex, objectName);
+        }
+        
+        private GameObject GetWallHolderFromEnum(Cell cell, WallHolder wallEnum)
+        {
+            GameObject wallHolder = wallEnum switch
+            {
+                WallHolder.Left => cell.wallLeft,
+                WallHolder.Bottom => cell.wallBottom,
+                _ => null
+            };
+            if (wallHolder == null) throw new ArgumentException("Invalid enum member");
+            return wallHolder;
+        }
+
+        [Rpc(SendTo.Everyone)]
+        private void InstantiateObjectsOnWallsRpc(NetworkObjectReference cellReference, WallHolder wallHolderEnum, int wallObjectIndex, FixedString64Bytes objectName64Bytes)
+        {
+            cellReference.TryGet(out var cellObj);
+            var cell = cellObj.GetComponent<Cell>();
+            
+            var wallHolder = GetWallHolderFromEnum(cell, wallHolderEnum);
+            var wall = wallHolder.GetComponentInChildren<Maze.Wall>(true);
+            
+            string objectName = objectName64Bytes.ToString();
+            Transform wallSlot = wall.transform.Find(objectName);
+            var wallObject = wall.ObjectsOnWalls[wallObjectIndex].prefab;
+            
+            Instantiate(wallObject, wallSlot);
         }
 
         [Rpc(SendTo.Everyone)]
@@ -330,7 +398,7 @@ namespace Maze
             }
         }
 
-        GameObject GetRandomPrefab(List<WeightedPrefab> weightedPrefabs)
+        int GetRandomPrefabIndex(List<WeightedPrefab> weightedPrefabs)
         {
             float totalWeight = 0;
             foreach (var wp in weightedPrefabs)
@@ -341,11 +409,11 @@ namespace Maze
             foreach (var wp in weightedPrefabs)
             {
                 if (randomPoint < wp.weight)
-                    return wp.prefab;
+                    return weightedPrefabs.IndexOf(wp);
                 randomPoint -= wp.weight;
             }
 
-            return weightedPrefabs[0].prefab;
+            return 0;
         }
 
         private void AdjustPrefabScale(GameObject prefabInstance, float minSize = 0.84f)
