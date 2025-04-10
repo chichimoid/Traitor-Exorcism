@@ -10,11 +10,13 @@ namespace ObjectScripts
         [SerializeField] private float rotationAngle = 90f; 
         [SerializeField] private float rotationSpeed = 5f;
         [SerializeField] private Door door;
+        [SerializeField] private AudioSource audioSource;
 
         private bool _isUp = false;
         private Quaternion _downRotation;
         private Quaternion _upRotation;
         private bool _isMoving = false;
+        private bool _hasMoved = false;
 
         private void Start()
         {
@@ -30,16 +32,26 @@ namespace ObjectScripts
             door.MoveDoorLocal();
             door.IsLocked = true;
         }
+
+        private void LeverActionSound()
+        {
+            _isUp = !_isUp;
+            StartCoroutine(RotateLever());
+            audioSource.Stop();
+        }
+
         private void LeverAction()
         {
             _isUp = !_isUp;
             StartCoroutine(RotateLever());
             Debug.Log("Lever pressed!");
+            _hasMoved = true;
         }
 
         public void Interact(Transform interactor)
         {
             InteractRpc();
+            _hasMoved = true;
         }
 
         [Rpc(SendTo.Everyone)]
@@ -47,9 +59,9 @@ namespace ObjectScripts
         {
             if (!_isMoving)
             {
-                if (door is not null)
+                if (audioSource is not null)
                 {
-                    LeverActionDoor();
+                    LeverActionSound();
                 }
                 else
                 {
@@ -58,7 +70,7 @@ namespace ObjectScripts
             }
         }
 
-        public bool CanInteract() => !_isMoving;
+        public bool CanInteract() => !_isMoving && !_hasMoved;
 
         private System.Collections.IEnumerator RotateLever()
         {
