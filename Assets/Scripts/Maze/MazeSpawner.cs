@@ -30,18 +30,6 @@ namespace Maze
             Color.yellow,
             Color.cyan,
         };
-
-        private enum CellObjectList
-        {
-            Walls,
-            Items
-        }
-        
-        private enum WallHolder
-        {
-            Left,
-            Bottom
-        }
         
         public static MazeSpawner Instance { get; private set; }
 
@@ -142,17 +130,13 @@ namespace Maze
                 }
             }
         }
-        /// <param name="leftWall">
-        /// true = wallLeft, false = wallBottom
-        /// </param>
         [Rpc(SendTo.Everyone)]
         private void DestroyWallRpc(NetworkObjectReference cellReference, WallHolder wallEnum)
         {
             cellReference.TryGet(out var cellObj);
             var cell = cellObj.GetComponent<Cell>();
-            // Destroy(leftWall ? cell.wallLeft : cell.wallBottom);
-
-            Destroy(GetWallHolderFromEnum(cell, wallEnum));
+            
+            Destroy(wallEnum.ToWallObject(cell));
         }
 
         [Rpc(SendTo.Everyone)]
@@ -169,7 +153,7 @@ namespace Maze
         
         private void SpawnCellObjects(Cell cell, string objectName, CellObjectList objListEnum, bool scale = true, bool spawnAsChild = true)
         {
-            List<WeightedPrefab> objList = GetCellObjectListFromEnum(cell, objListEnum);
+            List<WeightedPrefab> objList = objListEnum.ToWeightedPrefabList(cell);
             
             Transform wallSlot = cell.transform.Find(objectName);
             Debug.Log($"Spawning in {objectName}");
@@ -203,8 +187,8 @@ namespace Maze
         {
             cellReference.TryGet(out var cellObj);
             var cell = cellObj.GetComponent<Cell>();
-            
-            var objList = GetCellObjectListFromEnum(cell, objListEnum);
+
+            var objList = objListEnum.ToWeightedPrefabList(cell);
             
             string objectName = objectName64Bytes.ToString();
             Transform wallSlot = cell.transform.Find(objectName);
@@ -219,18 +203,6 @@ namespace Maze
                 AdjustPrefabScale(spawnedObj);
             }
             // SnapToGroundWithRaycast(spawnedObj);
-        }
-
-        private List<WeightedPrefab> GetCellObjectListFromEnum(Cell cell, CellObjectList objListEnum)
-        {
-            List<WeightedPrefab> objList = objListEnum switch
-            {
-                CellObjectList.Walls => cell.walls,
-                CellObjectList.Items => cell.items,
-                _ => null
-            };
-            if (objList == null) throw new ArgumentException("Invalid enum member");
-            return objList;
         }
 
         void AlignToPlaceholder(Transform placeholder, GameObject targetObj, bool rotate = false)
@@ -317,7 +289,7 @@ namespace Maze
 
         private void SpawnObjectsOnWall(Cell cell, WallHolder wallHolderEnum, string objectName)
         {
-            var wallHolder = GetWallHolderFromEnum(cell, wallHolderEnum);
+            var wallHolder = wallHolderEnum.ToWallObject(cell);
             
             if (wallHolder == null)
             {
@@ -342,18 +314,6 @@ namespace Maze
             
             InstantiateObjectsOnWallsRpc(cell.GetComponent<NetworkObject>(), wallHolderEnum, wallObjectIndex, objectName);
         }
-        
-        private GameObject GetWallHolderFromEnum(Cell cell, WallHolder wallEnum)
-        {
-            GameObject wallHolder = wallEnum switch
-            {
-                WallHolder.Left => cell.wallLeft,
-                WallHolder.Bottom => cell.wallBottom,
-                _ => null
-            };
-            if (wallHolder == null) throw new ArgumentException("Invalid enum member");
-            return wallHolder;
-        }
 
         [Rpc(SendTo.Everyone)]
         private void InstantiateObjectsOnWallsRpc(NetworkObjectReference cellReference, WallHolder wallHolderEnum, int wallObjectIndex, FixedString64Bytes objectName64Bytes)
@@ -361,7 +321,7 @@ namespace Maze
             cellReference.TryGet(out var cellObj);
             var cell = cellObj.GetComponent<Cell>();
             
-            var wallHolder = GetWallHolderFromEnum(cell, wallHolderEnum);
+            var wallHolder = wallHolderEnum.ToWallObject(cell);
             var wall = wallHolder.GetComponentInChildren<Maze.Wall>(true);
             
             string objectName = objectName64Bytes.ToString();
