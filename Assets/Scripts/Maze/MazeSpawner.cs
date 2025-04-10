@@ -5,6 +5,7 @@ using Unity.Services.Authentication;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.UIElements;
 using static Unity.Cinemachine.CinemachineSplineRoll;
 
 namespace Maze
@@ -174,10 +175,9 @@ namespace Maze
             else
             {
                 spawnedObj = Instantiate(wallObject, wallSlot.transform.position, wallSlot.transform.rotation);
+                AlignToPlaceholder(wallSlot, spawnedObj);
             }
             Debug.Log($"My position is {spawnedObj.transform.localPosition}");
-            // spawnedObj.transform.localPosition = Vector3.zero; // ���������� �������
-            // spawnedObj.transform.localRotation = Quaternion.identity; // ���������� �������
             ApplyRandomTransform(spawnedObj.transform);
 
             if (scale)
@@ -191,7 +191,34 @@ namespace Maze
                 spawnedObj.GetComponent<NetworkObject>().Spawn(true);
             }
         }
-        
+
+        void AlignToPlaceholder(Transform placeholder, GameObject targetObj, bool rotate = false)
+        {
+            if (placeholder == null || targetObj == null) return;
+
+            // Получаем рендерер или коллайдер для расчёта нижней точки
+            Renderer renderer = targetObj.GetComponent<Renderer>();
+            if (renderer == null) return;
+
+            Bounds bounds = renderer.bounds;
+
+            // Вычисляем вертикальное смещение: разница между пивотом объекта и нижней точкой меша по Y
+            float verticalOffset = targetObj.transform.position.y - bounds.min.y;
+
+            // Сохраняем текущие X и Z объекта, меняем только Y
+            Vector3 newPosition = new Vector3(
+                targetObj.transform.position.x,          // Сохраняем X
+                placeholder.position.y + verticalOffset, // Новый Y
+                targetObj.transform.position.z           // Сохраняем Z
+            );
+
+            targetObj.transform.position = newPosition;
+            if (rotate)
+            {
+                targetObj.transform.rotation = placeholder.rotation;
+            }
+        }
+
         [Rpc(SendTo.Everyone)]
         private void DestroyWallSlotObjRpc(NetworkObjectReference cellReference, FixedString64Bytes objectName64Bytes)
         {
@@ -270,6 +297,7 @@ namespace Maze
                 return;
             }
             var spawnedObj = Instantiate(wallObject, wallSlot.transform.position, wallSlot.transform.rotation);
+            AlignToPlaceholder(wallSlot, spawnedObj, true);
             spawnedObj.GetComponent<NetworkObject>().Spawn(true);
         }
 
