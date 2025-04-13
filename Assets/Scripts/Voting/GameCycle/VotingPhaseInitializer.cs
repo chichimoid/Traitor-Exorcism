@@ -14,8 +14,7 @@ namespace Voting
         [SerializeField] private float votingCircleRadius;
         [SerializeField] private Vector3 voteDisplayerLocalSpawnOffset;
         [SerializeField] private int votingTimeSeconds;
-
-        [FormerlySerializedAs("timer")]
+        
         [Header("References")]
         [SerializeField] private ServerTimer serverTimer;
         
@@ -23,7 +22,7 @@ namespace Voting
         [SerializeField] private Transform voteManagerPrefab;
         [SerializeField] private Transform voteDisplayerPrefab;
 
-        public void StartVotingPhase()
+        public void Init()
         {
             var len = NetworkManager.Singleton.ConnectedClients.Count;
             var spawnedNetworkObject = Instantiate(voteManagerPrefab).GetComponent<NetworkObject>();

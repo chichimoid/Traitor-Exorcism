@@ -1,12 +1,14 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using PlayerScripts;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class PlayerStamina : NetworkBehaviour
 {
-        [SerializeField] private float maxStamina = 100f;
-        [SerializeField] private float sprintStaminaWaste = 0.5f;
+        [SerializeField] private float maxValue = 100f;
+        [SerializeField] private float sprintWasteValue = 0.5f;
         [SerializeField] private float regenTick = 0.1f;
         [SerializeField] private float regenDelay = 2f;
         [SerializeField] private float regenValue = 2f;
@@ -16,21 +18,25 @@ public class PlayerStamina : NetworkBehaviour
         
         public float Stamina {
             get => _stamina.Value; 
-            set => _stamina.Value = value;
+            private set => _stamina.Value = value;
         }
 
         private void Start()
         {
             if (!IsOwner) return;
-            _stamina = new FixedIntervalFloat(maxStamina, maxStamina);
+            
+            _stamina = new FixedIntervalFloat(maxValue, maxValue);
             
             var playerMovement = GetComponent<PlayerMovement>();
-            playerMovement.OnPlayerIsRunning += () => WasteStamina(sprintStaminaWaste);
+            playerMovement.OnPlayerIsRunning += () => Decrease(sprintWasteValue);
         }
-
-        public void WasteStamina(float value)
+        
+        /// <param name="value">Positive, use Increase() for negative.</param>
+        public void Decrease(float value)
         {
             if (!IsOwner) return;
+            
+            if (value <= 0) throw new ArgumentException("<value> must be positive.");
             
             if (_regenAfterDelayCoroutine != null)
             {
@@ -38,7 +44,7 @@ public class PlayerStamina : NetworkBehaviour
             }
             
             Stamina -= value;
-            Debug.Log($"Player {NetworkManager.Singleton.LocalClientId} stamina changed: {Stamina}");
+            //Debug.Log($"Player {NetworkManager.Singleton.LocalClientId} stamina changed: {Stamina}");
             
             CheckTired();
             
@@ -61,7 +67,7 @@ public class PlayerStamina : NetworkBehaviour
             while (Stamina < 100f)
             {
                 Stamina += regenValue;
-                Debug.Log($"Player {NetworkManager.Singleton.LocalClientId} stamina changed: {Stamina}");
+                //Debug.Log($"Player {NetworkManager.Singleton.LocalClientId} stamina changed: {Stamina}");
                 yield return new WaitForSeconds(regenTick);
             }
         }

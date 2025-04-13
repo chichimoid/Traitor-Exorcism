@@ -1,13 +1,14 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 
-namespace PlayerScripts
+namespace PlayerScripts.UI
 {
     public class ActivatableMenu : MonoBehaviour
     {
-        [SerializeField] private GameObject ui;
+        [SerializeField] private GameObject uiObject;
         [SerializeField] private string inputActionName;
-        [SerializeField] private bool lockPlayerMovement;
+        [SerializeField] private bool lockPlayerActions;
         [SerializeField] private bool requireHoldingKey;
         [SerializeField] private bool hiddenByDefault;
         
@@ -20,7 +21,7 @@ namespace PlayerScripts
 
             if (hiddenByDefault)
             {
-                ui.SetActive(false);
+                uiObject.SetActive(false);
             }
             
             OnEnable();
@@ -48,11 +49,12 @@ namespace PlayerScripts
         {
             _isActive = true;
             
-            ui.SetActive(true);
+            uiObject.SetActive(true);
             PlayerLocker.Instance.UnlockCursor();
-            if (lockPlayerMovement)
+            if (lockPlayerActions)
             {
                 PlayerLocker.Instance.LockMovement();
+                PlayerLocker.Instance.LockActions();
             }
         }
         
@@ -60,11 +62,12 @@ namespace PlayerScripts
         {
             _isActive = false;
             
-            ui.SetActive(false);
+            uiObject.SetActive(false);
             PlayerLocker.Instance.LockCursor();
-            if (lockPlayerMovement)
+            if (lockPlayerActions)
             {
                 PlayerLocker.Instance.UnlockMovement();
+                PlayerLocker.Instance.UnlockActions();
             }
         }
         

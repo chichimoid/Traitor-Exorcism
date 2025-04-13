@@ -1,4 +1,5 @@
-﻿using Unity.Netcode;
+﻿using Maze;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace Voting
@@ -6,6 +7,7 @@ namespace Voting
     public class VotingSceneInitializer : NetworkBehaviour
     {
         [SerializeField] private VotingPhaseInitializer votingPhaseInitializer;
+        [SerializeField] private VotingPhaseEnder votingPhaseEnder;
         
         private readonly NetworkVariable<int> _spawnedPlayers = new(0);
         
@@ -23,7 +25,9 @@ namespace Voting
 
             if (_spawnedPlayers.Value == NetworkManager.Singleton.ConnectedClients.Count)
             {
-                votingPhaseInitializer.StartVotingPhase();
+                votingPhaseInitializer.Init();
+                GameManager.Instance.OnVotingSceneStarted(votingPhaseInitializer, votingPhaseEnder);
+                
             }
         }
     }

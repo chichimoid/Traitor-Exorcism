@@ -1,24 +1,22 @@
 ﻿using ObjectScripts;
 using UnityEngine;
 
-namespace PlayerScripts
+namespace PlayerScripts.UI
 {
     /// <summary>
-    /// Shows a universal UI for interacton/attack. TBA: extend for differentiation
+    /// Shows UI for interaction, attack etc. TBA: extend for differentiation
     /// </summary>
-    public class CrosshairUIManager : MonoBehaviour
+    public class ReachableObjectDetector : MonoBehaviour
     {
         private float _interactionRange;
-        
         private PlayerRayCaster _rayCaster;
-        private GameObject _interactionUI;
-
+        private bool _interactablePresent = false;
+        
         private void Start()
         {
             _interactionRange = GetComponent<PlayerInteract>().InteractionRange;
             
             _rayCaster = GetComponent<PlayerRayCaster>();
-            _interactionUI = PlayerUI.Instance.InteractionUI;
         }
         private void Update()
         {
@@ -34,9 +32,23 @@ namespace PlayerScripts
                 {
                     interactablePresent = true;
                 }
-            } 
+            }
 
-            _interactionUI.SetActive(interactablePresent);
+            if (interactablePresent && !_interactablePresent)
+            {
+                _interactablePresent = true;
+                OnInteractableFound?.Invoke();
+            }
+            else if (!interactablePresent && _interactablePresent)
+            {
+                _interactablePresent = false;
+                OnInteractableLost?.Invoke();
+            }
         }
+
+        public delegate void OnInteractableFoundDelegate();
+        public event OnInteractableFoundDelegate OnInteractableFound;
+        public delegate void OnInteractableLostDelegate();
+        public event OnInteractableLostDelegate OnInteractableLost;
     }
 }

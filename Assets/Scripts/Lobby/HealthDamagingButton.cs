@@ -9,7 +9,7 @@ namespace Lobby
     {
         public void Interact(Transform player)
         {
-            player.GetComponent<PlayerHealth>().DamageHealth(20);
+            player.GetComponent<PlayerHealth>().Damage(20);
         }
     }
 }

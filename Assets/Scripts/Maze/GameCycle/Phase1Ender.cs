@@ -1,10 +1,8 @@
-﻿using System.Collections.Generic;
-using NetworkHelperScripts;
+﻿using NetworkHelperScripts;
 using Unity.Netcode;
 using UnityEngine;
-using Voting;
 
-namespace Maze
+namespace Maze.GameCycle
 {
     public class Phase1Ender : NetworkBehaviour
     {
@@ -17,7 +15,10 @@ namespace Maze
         
         private void End()
         {
-            GameManager.Instance.StartPhase2();
+            OnPhase1Ended?.Invoke();
         }
+
+        public delegate void OnPhase1EndedDelegate();
+        public event OnPhase1EndedDelegate OnPhase1Ended;
     }
 }

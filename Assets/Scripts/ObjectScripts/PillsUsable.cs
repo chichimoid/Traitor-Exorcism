@@ -14,14 +14,24 @@ namespace ObjectScripts
                 Debug.Log("Pills is over...");
                 return;
             }
-            if (Player.GetComponent<PlayerHealth>().Infection == 0)
+            
+            if (Player.GetComponent<NetworkPlayer>().Role == PlayerRole.Monster)
             {
-                Debug.Log("�� ��������� �������! ���������� ��������.");
-                return;
+                Player.GetComponent<MonsterBar>().Decrease(10);
             }
-            Player.GetComponent<PlayerHealth>().InflictInfection(-10); 
+            else
+            {
+                if (Player.GetComponent<PlayerInfection>().Value == 0)
+                {
+                    Debug.Log("�� ��������� �������! ���������� ��������.");
+                    return;
+                }
+
+                Player.GetComponent<PlayerInfection>().Decrease(10);
+            }
+            
             _count--;
-            Debug.Log($"Current infection: {Player.GetComponent<PlayerHealth>().Infection}. �������� �������������: {_count}");
+            Debug.Log($"Current infection: {Player.GetComponent<PlayerInfection>().Value}. �������� �������������: {_count}");
         }
     }
 }

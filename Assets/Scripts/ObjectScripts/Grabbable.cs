@@ -30,21 +30,21 @@ namespace ObjectScripts
         }
 
         [Rpc(SendTo.Everyone)]
-        private void InteractRpc(NetworkObjectReference parentReference)
+        private void InteractRpc(NetworkObjectReference interactorReference)
         {
             _canInteract = false;
             _objectRigidbody.isKinematic = true;
             _objectCollider.isTrigger = true;
 
-            parentReference.TryGet(out NetworkObject parent);
-            if (parent.GetComponent<NetworkPlayer>().HeldObjSecond is not null)
+            interactorReference.TryGet(out NetworkObject interactor);
+            if (interactor.GetComponent<NetworkPlayer>().HeldObjSecond is not null)
             {
-                FollowTransformManager.Instance.Follow(transform, parent.GetComponent<PlayerInteract>().HoldPointTransformSecond);
+                FollowTransformManager.Instance.Follow(transform, interactor.GetComponent<PlayerInteract>().HoldPointTransformSecond);
                 return;
             }
-            FollowTransformManager.Instance.Follow(transform, parent.GetComponent<PlayerInteract>().HoldPointTransformMain);
+            FollowTransformManager.Instance.Follow(transform, interactor.GetComponent<PlayerInteract>().HoldPointTransformMain);
             
-            Player = parent.transform;
+            Player = interactor.transform;
         }
 
         public void Drop()

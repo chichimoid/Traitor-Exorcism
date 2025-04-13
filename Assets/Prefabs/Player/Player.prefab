@@ -268,9 +268,11 @@ GameObject:
   - component: {fileID: 6262159336189016517}
   - component: {fileID: 4920191347568054907}
   - component: {fileID: 4122445992884126514}
+  - component: {fileID: 5167530342270831739}
   - component: {fileID: 1413153615347095488}
   - component: {fileID: 8724584566671273727}
   - component: {fileID: 7799687200577962038}
+  - component: {fileID: 6963542823177533969}
   - component: {fileID: 5078071764432592721}
   - component: {fileID: 3746074126065957678}
   - component: {fileID: 4336482414689770037}
@@ -484,11 +486,26 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  maxHealth: 100
-  maxImmunity: 100
+  maxValue: 100
   regenTick: 0.5
   regenDelay: 3
   regenValue: 1
+--- !u!114 &5167530342270831739
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1335080514779221509}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 870ea51e75ec4520beb529bb7132f98c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  maxValue: 100
+  proximityIncreaseTick: 0.5
+  proximityIncreaseValue: 2
 --- !u!114 &1413153615347095488
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -502,8 +519,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  maxStamina: 100
-  sprintStaminaWaste: 0.5
+  maxValue: 100
+  sprintWasteValue: 0.5
   regenTick: 0.1
   regenDelay: 2
   regenValue: 2
@@ -539,6 +556,22 @@ MonoBehaviour:
   maxVerticalAngle: 85
   minVerticalAngle: -85
   head: {fileID: 2967216200531195706}
+--- !u!114 &6963542823177533969
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1335080514779221509}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4393805e4ac945b998d835277905df8c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  maxValue: 10
+  fillingTick: 1
+  fillingValue: 1
 --- !u!114 &5078071764432592721
 MonoBehaviour:
   m_ObjectHideFlags: 0

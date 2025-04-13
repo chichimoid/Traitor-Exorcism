@@ -1,31 +1,24 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
-namespace PlayerScripts
+namespace PlayerScripts.UI
 {
     public class PlayerUI : MonoBehaviour
     {
-        [SerializeField] private GameObject interactionUI;
-        [SerializeField] private GameObject emoteWheelUI;
-        [SerializeField] private GameObject pauseMenuUI;
-    
-        public GameObject InteractionUI => interactionUI;
-        public GameObject EmoteWheelUI => emoteWheelUI;
-        public GameObject PauseMenuUI => pauseMenuUI;
-    
+        [SerializeField] private ReachableObjectDisplayUI reachableObjectDisplayUI;
+        [SerializeField] private ActivatableMenu emoteWheelUI;
+        [SerializeField] private ActivatableMenu pauseMenuUI;
+        [SerializeField] private RoleDisplayUI roleDisplayUI;
+        
+        public ReachableObjectDisplayUI ReachableObjectDisplayUI => reachableObjectDisplayUI;
+        public ActivatableMenu EmoteWheelUI => emoteWheelUI;
+        public ActivatableMenu PauseMenuUI => pauseMenuUI;
+        public RoleDisplayUI RoleDisplayUI => roleDisplayUI;
         public static PlayerUI Instance { get; private set; }
-
+        
         private void Awake()
         {
             Instance = this;
-        }
-    
-        /// <summary>
-        /// To be called on player spawn.
-        /// Disables all UI that is automatically shown under certain conditions (e.g. interaction UI).
-        /// </summary>
-        public void DisableConditionalUI()
-        {
-            interactionUI.SetActive(false);
         }
     }
 }

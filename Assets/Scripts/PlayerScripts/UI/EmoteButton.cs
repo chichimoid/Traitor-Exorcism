@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-namespace PlayerScripts
+namespace PlayerScripts.UI
 {
     /// <summary>
     /// For now, only used with text emotes. Everything to be reconfigured for actual emotes.

@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace PlayerScripts
+namespace PlayerScripts.UI
 {
     public class ExitButton : MonoBehaviour
     {

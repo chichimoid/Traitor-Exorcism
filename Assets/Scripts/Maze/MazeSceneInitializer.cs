@@ -1,7 +1,9 @@
-﻿using PlayerScripts;
+﻿using Maze.GameCycle;
+using PlayerScripts;
 using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
+using Voting;
 
 namespace Maze
 {
@@ -12,6 +14,12 @@ namespace Maze
         [SerializeField] private int length;
         [Header("References")]
         [SerializeField] private Phase1Initializer phase1Initializer;
+        [SerializeField] private Phase1Ender phase1Ender;
+        [SerializeField] private Phase2Initializer phase2Initializer;
+        [SerializeField] private Phase2Ender phase2Ender;
+        [SerializeField] private Phase3Initializer phase3Initializer;
+        [SerializeField] private Phase3Ender phase3Ender;
+
         [Header("Prefabs")]
         [SerializeField] private Transform mazeSpawnerPrefab;
         
@@ -32,18 +40,17 @@ namespace Maze
         }
 
         [Rpc(SendTo.Server)]
-        public void PlayerSpawnedServerRpc()
+        private void PlayerSpawnedServerRpc()
         {
             ++_spawnedPlayers.Value;
 
             if (_spawnedPlayers.Value == NetworkManager.Singleton.ConnectedClients.Count)
             {
-                CreateMazeServerRpc();
+                InitScene();
             }
         }
         
-        [Rpc(SendTo.Server)]
-        private void CreateMazeServerRpc()
+        private void InitScene()
         {
             _mazeData.Value = new MazeData(width, length);
             var generator = new MazeGenerator();
@@ -55,13 +62,13 @@ namespace Maze
             spawnedObj.GetComponent<NetworkObject>().Spawn(true);
             spawnedObj.GetComponent<MazeSpawner>().SpawnMaze(_mazeData.Value);
             
-            phase1Initializer.StartPhase1();
+            GameManager.Instance.OnMazeSceneStarted(phase1Initializer, phase1Ender, phase2Initializer, phase2Ender, phase3Initializer, phase3Ender);
             
-            FinishSpawnRpc();
+            FinishInitSceneRpc();
         }
         
         [Rpc(SendTo.Everyone)]
-        private void FinishSpawnRpc()
+        private void FinishInitSceneRpc()
         {
             PlayerLocker.Instance.UnlockPhysics();
             PlayerLocker.Instance.UnlockRotation();

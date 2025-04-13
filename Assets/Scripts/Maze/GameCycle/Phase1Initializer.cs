@@ -1,10 +1,8 @@
 ﻿using NetworkHelperScripts;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.Serialization;
-using Voting;
 
-namespace Maze
+namespace Maze.GameCycle
 {
     public class Phase1Initializer : NetworkBehaviour
     {
@@ -15,13 +13,13 @@ namespace Maze
         [Header("References")] 
         [SerializeField] private ServerTimer serverTimer;
         
-        public void StartPhase1()
+        public void Init()
         {
             int phaseDuration = Random.Range(minPhaseDurationSeconds, maxPhaseDurationSeconds);
             
-            Debug.Log($"Starting phase 1 at {phaseDuration} seconds");
-            
             serverTimer.StartTimer(phaseDuration);
+            
+            GlobalDebugger.Instance.Log($"Phase 1 initialized at {phaseDuration} seconds");
         }
     }
 }

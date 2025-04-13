@@ -29,7 +29,7 @@ namespace Voting
                 GlobalDebugger.Instance.Log($"Player {playerToKickId} was not the monster.");
             }
             
-            GameManager.Instance.StartAftermath();
+            OnVotingPhaseEnded?.Invoke();
         }
         
         private ulong GetPlayerToKickId()
@@ -61,5 +61,8 @@ namespace Voting
 
             return maxVotesPlayersIds;
         }
+        
+        public delegate void OnVotingPhaseEndedDelegate();
+        public event OnVotingPhaseEndedDelegate OnVotingPhaseEnded;
     }
 }

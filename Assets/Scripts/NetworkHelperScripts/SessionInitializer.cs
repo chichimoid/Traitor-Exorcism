@@ -10,8 +10,6 @@ namespace NetworkHelperScripts
         
         public override void OnNetworkSpawn()
         {
-            Debug.Log("it worked");
-
             foreach (var prefab in intersceneObjectsPrefabs)
             {
                 var spawnedObject = Instantiate(prefab);

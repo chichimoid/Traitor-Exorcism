@@ -2,11 +2,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-namespace PlayerScripts
+namespace PlayerScripts.UI
 {
-    public class EmoteWheelUI : MonoBehaviour
+    public class EmoteContainer : MonoBehaviour
     {
-        [FormerlySerializedAs("buttons")] [SerializeField] private List<EmoteButton> emoteButtons;
+        [SerializeField] private List<EmoteButton> emoteButtons;
         
         public List<EmoteButton> EmoteButtons => emoteButtons;
     }

@@ -8,7 +8,7 @@ namespace Maze
     {
         public void Interact(Transform player)
         {
-            GameManager.Instance.StartPhase3();
+            //GameManager.Instance.StartPhase3();
         }
     }
 }

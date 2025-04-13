@@ -8,7 +8,7 @@ namespace Maze
     {
         public void Interact(Transform player)
         {
-            GameManager.Instance.StartVoting();
+            //GameManager.Instance.StartVotingPhase();
         }
     }
 }

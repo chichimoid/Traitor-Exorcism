@@ -1,122 +1,87 @@
+using System;
 using System.Collections;
 using NetworkHelperScripts;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace PlayerScripts
 {
     public class PlayerHealth : NetworkBehaviour
     {
-        [SerializeField] private float maxHealth = 100f;
-        [SerializeField] private float maxImmunity = 100f;
+        [SerializeField] private float maxValue = 100f;
         [SerializeField] private float regenTick = 0.5f;
         [SerializeField] private float regenDelay = 3f;
         [SerializeField] private float regenValue = 1f;
         
-        private FixedIntervalFloat _health;
-        private FixedIntervalFloat _immunity;
-        private FixedIntervalFloat _infection;
+        private FixedIntervalFloat _fixedIntervalFloat;
         private Coroutine _regenAfterDelayCoroutine;
-        
-        public float Health {
-            get => _health.Value; 
-            set => _health.Value = value;
-        }
-        public float Immunity {
-            get => _immunity.Value; 
-            set => _immunity.Value = value;
+
+        public float Value
+        {
+            get => _fixedIntervalFloat.Value;
+            private set => _fixedIntervalFloat.Value = value;
         }
 
-        public float Infection
-        {
-            get => _infection.Value;
-            set => _infection.Value = value;
-        }
-        public float MaxHealth
-        {
-            get => maxHealth;
-        }
+        public float MaxValue => maxValue;
+        
         private void Start()
         {
             if (!IsOwner) return;
-            _health = new FixedIntervalFloat(maxHealth, maxHealth);
-            _immunity = new FixedIntervalFloat(maxImmunity, maxImmunity);
-            _infection = new FixedIntervalFloat(0, maxImmunity);
+            
+            _fixedIntervalFloat = new FixedIntervalFloat(maxValue, maxValue);
         }
-
-        public void RegenHealth(float value)
+        /// <param name="value">positive</param>
+        public void Regen(float value)
         {
             if (!IsOwner) return;
             
-            Health += regenValue;
-            GlobalDebugger.Instance.Log($"Player {NetworkManager.Singleton.LocalClientId} health changed: {Health}");
+            if (value <= 0) throw new ArgumentException("<value> must be positive.");
+            
+            Value += value;
+            GlobalDebugger.Instance.Log($"Player {NetworkManager.Singleton.LocalClientId} health changed: {Value}");
         }
-        
-        public void DamageHealth(float value)
+        /// <param name="value">positive</param>
+        public void Damage(float value)
         {
             if (!IsOwner) return;
+            
+            if (value <= 0) throw new ArgumentException("<value> must be positive.");
             
             if (_regenAfterDelayCoroutine != null)
             {
                 StopCoroutine(_regenAfterDelayCoroutine);
             }
             
-            Health -= value;
-            GlobalDebugger.Instance.Log($"Player {NetworkManager.Singleton.LocalClientId} health changed: {Health}");
+            Value -= value;
+            GlobalDebugger.Instance.Log($"Player {NetworkManager.Singleton.LocalClientId} health changed: {Value}");
             CheckDead();
             
             _regenAfterDelayCoroutine = StartCoroutine(RegenAfterDelayCoroutine());
-        }
-        
-        public void DamageImmunity(float value)
-        {
-            if (!IsOwner) return;
-            
-            Immunity -= value;
-            GlobalDebugger.Instance.Log($"Player {NetworkManager.Singleton.LocalClientId} immuniyu changed: {Health}");
-            CheckInfected();
-        }
-
-        public void InflictInfection(float value)
-        {
-            if (!IsOwner) return;
-            
-            Infection += value;
-            GlobalDebugger.Instance.Log($"Player {NetworkManager.Singleton.LocalClientId} infection level changed: {Infection}");
-            CheckInfected();
         }
         
         private IEnumerator RegenAfterDelayCoroutine()
         {
             yield return new WaitForSeconds(regenDelay);
 
-            while (Health < maxHealth)
+            while (Value < maxValue)
             {
-                Health += regenValue;
-                GlobalDebugger.Instance.Log($"Player {NetworkManager.Singleton.LocalClientId} health changed: {Health}");
+                Regen(regenValue);
                 yield return new WaitForSeconds(regenTick);
             }
         }
         
         private void CheckDead()
         {
-            if (Health == 0f)
+            if (Value == 0f)
             {
-                Die();
-            }
-        }
-        
-        private void CheckInfected()
-        {
-            if (_infection.Value >= _immunity.Value)
-            {
-                Die();
+                OnPlayerDied?.Invoke();
             }
         }
 
-        private void Die()
-        {
-            GlobalDebugger.Instance.Log("Player is dead");
-        }
+        public delegate void OnPlayerDiedDelegate();
+
+        public event OnPlayerDiedDelegate OnPlayerDied;
+
     }
 }

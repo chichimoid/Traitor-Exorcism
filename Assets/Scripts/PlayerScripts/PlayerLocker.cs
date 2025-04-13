@@ -1,9 +1,14 @@
-﻿using UnityEngine;
+﻿using Unity.VisualScripting;
+using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace PlayerScripts
 {
     public class PlayerLocker : MonoBehaviour
     {
+        private PlayerInteract _playerInteract;
+        private PlayerAttack _playerAttack;
+        
         private PlayerMovement _playerMovement;
         private PlayerRotation _playerRotation;
         private Rigidbody _rigidbody;
@@ -16,6 +21,8 @@ namespace PlayerScripts
 
         private void Start()
         {
+            _playerInteract = GetComponent<PlayerInteract>();
+            _playerAttack = GetComponent<PlayerAttack>();
             _playerMovement = GetComponent<PlayerMovement>();
             _playerRotation = GetComponent<PlayerRotation>();
             _rigidbody = GetComponent<Rigidbody>();
@@ -56,10 +63,20 @@ namespace PlayerScripts
         {
             _rigidbody.isKinematic = true;
         }
-
         public void UnlockPhysics()
         {
             _rigidbody.isKinematic = false;
+        }
+
+        public void LockActions()
+        {
+            _playerInteract.enabled = false;
+            _playerAttack.enabled = false;
+        }
+        public void UnlockActions()
+        {
+            _playerInteract.enabled = true;
+            _playerAttack.enabled = true;
         }
     }
 }

@@ -35,22 +35,30 @@ namespace PlayerScripts
             {
                 switch (_state.Value)
                 {
-                    case PlayerState.InLobby: OnPlayerStateFromInLobby?.Invoke(); break;
-                    case PlayerState.InMaze: OnPlayerStateFromInMaze?.Invoke(); break;
-                    case PlayerState.InVoting: OnPlayerStateFromInVoting?.Invoke(); break;
+                    case PlayerState.InLobby: OnPlayerStateFromLobby?.Invoke(); break;
+                    case PlayerState.InMaze: OnPlayerStateFromMaze?.Invoke(); break;
+                    case PlayerState.InVoting: OnPlayerStateFromVoting?.Invoke(); break;
                 }
                 
                 switch (value)
                 {
-                    case PlayerState.InLobby: OnPlayerStateInLobby?.Invoke(); break;
-                    case PlayerState.InMaze: OnPlayerStateInMaze?.Invoke(); break;
-                    case PlayerState.InVoting: OnPlayerStateInVoting?.Invoke(); break;
+                    case PlayerState.InLobby: OnPlayerStateToLobby?.Invoke(); break;
+                    case PlayerState.InMaze: OnPlayerStateToMaze?.Invoke(); break;
+                    case PlayerState.InVoting: OnPlayerStateToVoting?.Invoke(); break;
                 }
                 _state.Value = value;
             }
         }
 
-        public PlayerRole Role { get => _role.Value; set => _role.Value = value; }
+        public PlayerRole Role
+        {
+            get => _role.Value;
+            set
+            {
+                OnPlayerRoleSet?.Invoke(value);
+                _role.Value = value;
+            }
+        }
 
         private Grabbable _heldObjMain;
         private Grabbable _heldObjSecond;
@@ -88,8 +96,7 @@ namespace PlayerScripts
             }
             _heldObjSecond = heldObj.GetComponent<Grabbable>();
         }
-
-
+        
         private void Start()
         {
             if (!IsOwner) return;
@@ -98,12 +105,25 @@ namespace PlayerScripts
             State = PlayerState.InLobby;
         }
         
+        public static NetworkPlayer GetLocalInstance()
+        {
+            return NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<NetworkPlayer>();
+        }
+        
+        public static NetworkPlayer GetInstance(ulong clientId)
+        {
+            return NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject.GetComponent<NetworkPlayer>();
+        }
+        
         public delegate void OnPlayerStateChangedDelegate();
-        public event OnPlayerStateChangedDelegate OnPlayerStateInLobby;
-        public event OnPlayerStateChangedDelegate OnPlayerStateFromInLobby;
-        public event OnPlayerStateChangedDelegate OnPlayerStateInMaze;
-        public event OnPlayerStateChangedDelegate OnPlayerStateFromInMaze;
-        public event OnPlayerStateChangedDelegate OnPlayerStateInVoting;
-        public event OnPlayerStateChangedDelegate OnPlayerStateFromInVoting;
+        public event OnPlayerStateChangedDelegate OnPlayerStateToLobby;
+        public event OnPlayerStateChangedDelegate OnPlayerStateFromLobby;
+        public event OnPlayerStateChangedDelegate OnPlayerStateToMaze;
+        public event OnPlayerStateChangedDelegate OnPlayerStateFromMaze;
+        public event OnPlayerStateChangedDelegate OnPlayerStateToVoting;
+        public event OnPlayerStateChangedDelegate OnPlayerStateFromVoting;
+
+        public delegate void OnPlayerRoleSetDelegate(PlayerRole role);
+        public event OnPlayerRoleSetDelegate OnPlayerRoleSet;
     }
 }

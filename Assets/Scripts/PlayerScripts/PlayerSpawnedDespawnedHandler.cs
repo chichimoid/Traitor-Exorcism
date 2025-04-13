@@ -1,5 +1,6 @@
 ﻿using Maze;
 using NetworkHelperScripts;
+using PlayerScripts.UI;
 using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -38,7 +39,7 @@ namespace PlayerScripts
             AddPlayerUI();
             transform.AddComponent<PlayerLocker>();
             transform.AddComponent<PlayerVoter>();
-            transform.AddComponent<CrosshairUIManager>();
+            transform.AddComponent<ReachableObjectDetector>();
             
             if (IsServer)
             {
@@ -57,7 +58,6 @@ namespace PlayerScripts
             
             Destroy(PlayerCamera.Instance?.gameObject);
             Destroy(SessionManager.Instance?.gameObject);
-            Destroy(GameManager.Instance?.gameObject);
             
             SceneLoader.Instance.LoadSceneLocal(SceneLoader.Scene.MainMenu);
         }
@@ -75,17 +75,15 @@ namespace PlayerScripts
             var tr = Instantiate(uiPrefab, transform);
             var playerUI = tr.GetComponent<PlayerUI>();
             
-            var emoteWheelUI = playerUI.EmoteWheelUI.GetComponent<EmoteWheelUI>();
+            var emoteWheelUI = playerUI.EmoteWheelUI.GetComponent<EmoteContainer>();
             var helper = GetComponent<TextDisplayer>();
             foreach (var emoteButton in emoteWheelUI.EmoteButtons)
             {
                 // This is very ugly due to proper emotes being absent.
-                // This is only a template for an actual emote system, where emotes are just text signs.
+                // This is only a draft for an actual emote system, where emotes are just text signs.
                 var text = emoteButton.EmoteName;
                 emoteButton.Button.onClick.AddListener(() => helper.TempDisplayText32Chars(text));
             }
-            
-            PlayerUI.Instance.DisableConditionalUI();
         }
     }
 }

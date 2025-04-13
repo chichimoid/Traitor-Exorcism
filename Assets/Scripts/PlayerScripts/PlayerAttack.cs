@@ -67,7 +67,7 @@ namespace PlayerScripts
             var attackedNetworkPlayer = attackedPlayer.GetComponent<NetworkPlayer>();
             var attackedPlayerHealth = attackedPlayer.GetComponent<PlayerHealth>();
             
-            if (NetworkManager.Singleton.LocalClientId == attackedNetworkPlayer.Id) attackedPlayerHealth.DamageHealth(damage);
+            if (NetworkManager.Singleton.LocalClientId == attackedNetworkPlayer.Id) attackedPlayerHealth.Damage(damage);
         }
     }
 }
