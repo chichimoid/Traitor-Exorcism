@@ -62,7 +62,7 @@ namespace PlayerScripts
         private void Interact(InputAction.CallbackContext context)
         {
             Debug.Log("Interact");
-            if (_rayCaster.ViewPointRayCast(out RaycastHit hit, interactionRange))
+            if (_rayCaster.ViewPointRayCast(out var hit, interactionRange))
             {
                 if (hit.collider.TryGetComponent(out IInteractable interactable) && interactable.CanInteract())
                 {

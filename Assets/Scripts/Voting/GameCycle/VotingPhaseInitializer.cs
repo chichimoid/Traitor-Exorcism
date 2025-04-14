@@ -1,11 +1,11 @@
 ﻿using System;
+using Maze;
 using NetworkHelperScripts;
 using PlayerScripts;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.Serialization;
 
-namespace Voting
+namespace Voting.GameCycle
 {
     public class VotingPhaseInitializer : NetworkBehaviour
     {
@@ -28,21 +28,23 @@ namespace Voting
             var spawnedNetworkObject = Instantiate(voteManagerPrefab).GetComponent<NetworkObject>();
             spawnedNetworkObject.Spawn(true);
             
-            serverTimer.StartTimer(votingTimeSeconds);
+            SetMonsterMeshBackTargetRpc(RpcTarget.Single(GameManager.GetMonsterId(), RpcTargetUse.Temp));
             
             for (int i = 0; i < len; i++)
             {
                 spawnedNetworkObject = Instantiate(voteDisplayerPrefab).GetComponent<NetworkObject>();
                 spawnedNetworkObject.Spawn(true);
                 
-                InitClientVotingRpc(i, len, spawnedNetworkObject, RpcTarget.Single(NetworkManager.Singleton.ConnectedClientsIds[i], RpcTargetUse.Temp));
+                InitClientVotingTargetRpc(i, len, spawnedNetworkObject, RpcTarget.Single(NetworkManager.Singleton.ConnectedClientsIds[i], RpcTargetUse.Temp));
                 
                 spawnedNetworkObject.GetComponent<VoteDisplayer>().BoundId = NetworkManager.Singleton.ConnectedClientsIds[i];
             }
+            
+            serverTimer.StartTimer(votingTimeSeconds);
         }
 
         [Rpc(SendTo.SpecifiedInParams)]
-        private void InitClientVotingRpc(int i, int len, NetworkObjectReference voteDisplayerReference, RpcParams rpcParams)
+        private void InitClientVotingTargetRpc(int i, int len, NetworkObjectReference voteDisplayerReference, RpcParams rpcParams)
         {
             PlayerLocker.Instance.LockMovement();
             
@@ -59,7 +61,6 @@ namespace Voting
         {
             PlayerLocker.Instance.LockRotation();
             PlayerLocker.Instance.LockPhysics();
-
 
             var playerPointOnVotingCircle = GetPlayerPointOnVotingCircle(i, len);
             var playerRb = playerObject.GetComponent<Rigidbody>();
@@ -84,6 +85,14 @@ namespace Voting
             followerReference.TryGet(out NetworkObject follower);
             targetReference.TryGet(out NetworkObject target);
             FollowTransformManager.Instance.Follow(follower.transform, target.transform);
+        }
+        
+        [Rpc(SendTo.SpecifiedInParams)]
+        private void SetMonsterMeshBackTargetRpc(RpcParams rpcParams)
+        {
+            var networkPlayer = NetworkPlayer.GetLocalInstance();
+            var playerMesh = networkPlayer.GetComponent<PlayerMesh>();
+            playerMesh.RevertSetMonsterMaterial();
         }
     }
 }

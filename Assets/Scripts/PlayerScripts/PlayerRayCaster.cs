@@ -12,7 +12,7 @@ namespace PlayerScripts
         }
         public bool ViewPointRayCast(out RaycastHit hit, float distance)
         {
-            Ray ray = _playerCamera.ViewportPointToRay(Vector3.one / 2f);
+            var ray = _playerCamera.ViewportPointToRay(Vector3.one / 2f);
             return Physics.Raycast(ray, out hit, distance);
         }
     }

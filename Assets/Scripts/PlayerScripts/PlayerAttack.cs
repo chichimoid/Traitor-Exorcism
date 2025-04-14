@@ -1,4 +1,5 @@
-﻿using ObjectScripts;
+﻿using System.Collections;
+using ObjectScripts;
 using Unity.Netcode;
 using Unity.Networking.Transport;
 using UnityEngine;
@@ -9,13 +10,16 @@ namespace PlayerScripts
     public class PlayerAttack : NetworkBehaviour
     {
         [Header("Configure")]
-        [SerializeField] private float meleeAttackRange = 3f;
-        [SerializeField] private float bareHandDamage = 10f;
+        [SerializeField] private float meleeAttackRange;
+        [SerializeField] private float bareHandDamage;
+        [SerializeField] private float attackCooldownSeconds;
         
         private NetworkPlayer _networkPlayer;
         private PlayerInputActions _inputActions;
         private InputAction _attack;
         private PlayerRayCaster _rayCaster;
+        
+        private bool _isOnCooldown = false;
 
         private void Start()
         {
@@ -47,27 +51,34 @@ namespace PlayerScripts
         {
             Debug.Log("Attack");
             
-            if (_rayCaster.ViewPointRayCast(out RaycastHit hit,  meleeAttackRange)) 
+            if (_rayCaster.ViewPointRayCast(out var hit,  meleeAttackRange)) 
             {
-                if (hit.collider.TryGetComponent(out NetworkPlayer otherPlayer) && otherPlayer.State == PlayerState.InMaze)
+                if (hit.collider.TryGetComponent(out NetworkPlayer otherPlayer) && otherPlayer.State == PlayerState.InMaze && !_isOnCooldown)
                 {
                     var heldObj = _networkPlayer.HeldObjMain;
 
                     var attackDamage = (heldObj as Weapon)?.Damage ?? bareHandDamage;
+                    
+                    StartCoroutine(AttackCooldownCoroutine());
 
-                    AttackRpc(otherPlayer.gameObject, attackDamage, RpcTarget.Single(otherPlayer.Id, RpcTargetUse.Temp));
+                    AttackTargetRpc(otherPlayer.gameObject, attackDamage, RpcTarget.Single(otherPlayer.Id, RpcTargetUse.Temp));
                 }
             }
         }
 
         [Rpc(SendTo.SpecifiedInParams)]
-        private void AttackRpc(NetworkObjectReference attackedPlayerReference, float damage, RpcParams rpcParams)
+        private void AttackTargetRpc(NetworkObjectReference attackedPlayerReference, float damage, RpcParams rpcParams)
         {
             attackedPlayerReference.TryGet(out var attackedPlayer);
-            var attackedNetworkPlayer = attackedPlayer.GetComponent<NetworkPlayer>();
             var attackedPlayerHealth = attackedPlayer.GetComponent<PlayerHealth>();
-            
-            if (NetworkManager.Singleton.LocalClientId == attackedNetworkPlayer.Id) attackedPlayerHealth.Damage(damage);
+            attackedPlayerHealth.Damage(damage);
+        }
+
+        private IEnumerator AttackCooldownCoroutine()
+        {
+            _isOnCooldown = true;
+            yield return new WaitForSeconds(attackCooldownSeconds);
+            _isOnCooldown = false;
         }
     }
 }

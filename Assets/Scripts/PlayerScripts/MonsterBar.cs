@@ -26,7 +26,13 @@ namespace PlayerScripts
             
             _fixedIntervalFloat = new FixedIntervalFloat(0, maxValue);
             
-            enabled = false;
+            EnabledServerRpc(false);
+        }
+
+        [Rpc(SendTo.Everyone)]
+        private void EnabledServerRpc(bool value)
+        {
+            enabled = value;
         }
 
         public void StartFilling()
@@ -73,8 +79,14 @@ namespace PlayerScripts
         {
             if (Value >= maxValue)
             {
-                OnMonsterTurned?.Invoke();
+                OnMonsterTurnedServerRpc();
             }
+        }
+
+        [Rpc(SendTo.Server)]
+        private void OnMonsterTurnedServerRpc()
+        {
+            OnMonsterTurned?.Invoke();
         }
 
         public delegate void OnMonsterTurnedDelegate();

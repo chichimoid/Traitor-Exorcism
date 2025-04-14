@@ -1,6 +1,7 @@
 ﻿using Maze;
 using Unity.Netcode;
 using UnityEngine;
+using Voting.GameCycle;
 
 namespace Voting
 {

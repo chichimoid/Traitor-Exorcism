@@ -17,7 +17,7 @@ namespace ObjectScripts
             
             if (Player.GetComponent<NetworkPlayer>().Role == PlayerRole.Monster)
             {
-                Player.GetComponent<MonsterBar>().Decrease(10);
+                Player.GetComponent<MonsterBar>().Increase(10);
             }
             else
             {

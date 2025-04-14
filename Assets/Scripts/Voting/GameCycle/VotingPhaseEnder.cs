@@ -1,12 +1,10 @@
 ﻿using System.Collections.Generic;
 using Maze;
 using NetworkHelperScripts;
-using PlayerScripts;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.Serialization;
 
-namespace Voting
+namespace Voting.GameCycle
 {
     public class VotingPhaseEnder : NetworkBehaviour
     {
@@ -20,7 +18,7 @@ namespace Voting
         private void End()
         {
             var playerToKickId = GetPlayerToKickId();
-            if (playerToKickId == GameManager.Instance.GetMonsterId())
+            if (playerToKickId == GameManager.GetMonsterId())
             {
                 GlobalDebugger.Instance.Log($"Player {playerToKickId} was indeed the monster.");
             }

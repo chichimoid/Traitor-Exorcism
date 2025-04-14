@@ -2,33 +2,36 @@
 using Unity.Netcode;
 using UnityEngine;
 
-public class FollowTransformManager : NetworkBehaviour
+namespace NetworkHelperScripts
 {
-    private readonly Dictionary<Transform, Transform> _followersTargets = new();
-    
-    public static FollowTransformManager Instance { get; private set; }
-    
-    private void Awake()
+    public class FollowTransformManager : NetworkBehaviour
     {
-        Instance = this;
-    }
+        private readonly Dictionary<Transform, Transform> _followersTargets = new();
     
-    public void Follow(Transform follower, Transform target)
-    {
-        _followersTargets.Add(follower, target);
-    }
+        public static FollowTransformManager Instance { get; private set; }
     
-    public void Unfollow(Transform follower)
-    {
-        _followersTargets.Remove(follower.transform);
-    }
-
-    private void LateUpdate()
-    {
-        foreach (var (follower, target) in _followersTargets)
+        private void Awake()
         {
-            follower.position = target.position;
-            follower.rotation = target.rotation;
+            Instance = this;
+        }
+    
+        public void Follow(Transform follower, Transform target)
+        {
+            _followersTargets.Add(follower, target);
+        }
+    
+        public void Unfollow(Transform follower)
+        {
+            _followersTargets.Remove(follower.transform);
+        }
+
+        private void LateUpdate()
+        {
+            foreach (var (follower, target) in _followersTargets)
+            {
+                follower.position = target.position;
+                follower.rotation = target.rotation;
+            }
         }
     }
 }

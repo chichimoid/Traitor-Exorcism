@@ -7,7 +7,7 @@ namespace Voting
 {
     public class VoteManager : NetworkBehaviour
     {
-        public NetworkList<int> Votes = new(new List<int>());
+        public readonly NetworkList<int> Votes = new(new List<int>());
         public static VoteManager Instance { get; private set; }
 
         private void Awake()

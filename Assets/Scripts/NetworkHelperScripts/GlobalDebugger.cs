@@ -2,27 +2,30 @@
 using Unity.Netcode;
 using UnityEngine;
 
-public class GlobalDebugger : NetworkBehaviour
+namespace NetworkHelperScripts
 {
-    public static GlobalDebugger Instance { get; private set; }
-
-    private void Awake()
+    public class GlobalDebugger : NetworkBehaviour
     {
-        Instance = this;
-    }
+        public static GlobalDebugger Instance { get; private set; }
+
+        private void Awake()
+        {
+            Instance = this;
+        }
     
-    /// <summary>
-    /// Has a 256 char limit.
-    /// </summary>
-    /// <param name="message"></param>
-    public void Log(string message)
-    {
-        LogRpc(message);
-    }
+        /// <summary>
+        /// Has a 256 char limit.
+        /// </summary>
+        /// <param name="message"></param>
+        public void Log(string message)
+        {
+            LogRpc(message);
+        }
 
-    [Rpc(SendTo.Everyone)]
-    private void LogRpc(FixedString512Bytes message)
-    {
-        Debug.Log(message);
+        [Rpc(SendTo.Everyone)]
+        private void LogRpc(FixedString512Bytes message)
+        {
+            Debug.Log(message);
+        }
     }
 }

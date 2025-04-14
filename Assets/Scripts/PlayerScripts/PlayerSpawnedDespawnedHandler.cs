@@ -1,4 +1,5 @@
-﻿using Maze;
+﻿using MainMenu;
+using Maze;
 using NetworkHelperScripts;
 using PlayerScripts.UI;
 using Unity.Netcode;
@@ -11,7 +12,7 @@ namespace PlayerScripts
 {
     /// <summary>
     /// Player component script.
-    /// Attaches various essential components to the player when one spawns.
+    /// Attaches various local components to the player when one spawns.
     /// Detaches everything, when the player despawns.
     /// Also handles the main camera (PlayerCamera).
     /// </summary>
@@ -57,7 +58,7 @@ namespace PlayerScripts
             Cursor.lockState = CursorLockMode.None;
             
             Destroy(PlayerCamera.Instance?.gameObject);
-            Destroy(SessionManager.Instance?.gameObject);
+            Destroy(ConnectionManager.Instance?.gameObject);
             
             SceneLoader.Instance.LoadSceneLocal(SceneLoader.Scene.MainMenu);
         }
