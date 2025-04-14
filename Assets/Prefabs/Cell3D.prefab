@@ -95,7 +95,7 @@ MonoBehaviour:
   - prefab: {fileID: 143668, guid: 381bdf9c7f27cce46b2699033a9b735a, type: 3}
     weight: 1
   - prefab: {fileID: 3695430918361020415, guid: 001d511e94541e648a671aa2928eab96, type: 3}
-    weight: 1
+    weight: 5
   - prefab: {fileID: 1026669413012722, guid: 57d3e693aabffc0469483a7ea0e6d1e5, type: 3}
     weight: 1
   - prefab: {fileID: 6146498833018448691, guid: d7f16bebf84a8be45a4edf754a799508, type: 3}
@@ -110,7 +110,7 @@ MonoBehaviour:
     weight: 1
   items:
   - prefab: {fileID: 0}
-    weight: 100
+    weight: 40
   - prefab: {fileID: 1987713744733760, guid: 5af5082d208216c4bb164fd2587b0090, type: 3}
     weight: 3
   - prefab: {fileID: 693183803092694530, guid: 367884cd371f0bc4b91c49da08f43859, type: 3}
@@ -119,6 +119,8 @@ MonoBehaviour:
     weight: 1
   - prefab: {fileID: 1985338178271116, guid: e38ddfeb22f20cd4b8485c8848294539, type: 3}
     weight: 3
+  - prefab: {fileID: 1329036786104595201, guid: acb5e9a1dc016f14a830aeb6350a7208, type: 3}
+    weight: 2
 --- !u!114 &8879542961208221453
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -387,6 +389,10 @@ PrefabInstance:
     - target: {fileID: 6093998257674746280, guid: 679d01f1663ad0c4f9b644f3b3d61f91, type: 3}
       propertyPath: m_Name
       value: Wall
+      objectReference: {fileID: 0}
+    - target: {fileID: 6876827472829322341, guid: 679d01f1663ad0c4f9b644f3b3d61f91, type: 3}
+      propertyPath: m_StaticShadowCaster
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -667,6 +673,10 @@ PrefabInstance:
     - target: {fileID: 6093998257674746280, guid: 679d01f1663ad0c4f9b644f3b3d61f91, type: 3}
       propertyPath: m_Name
       value: Wall
+      objectReference: {fileID: 0}
+    - target: {fileID: 6876827472829322341, guid: 679d01f1663ad0c4f9b644f3b3d61f91, type: 3}
+      propertyPath: m_StaticShadowCaster
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -31,8 +31,8 @@ Transform:
   m_GameObject: {fileID: 693183803092694530}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0, y: 0, z: 0}
-  m_LocalScale: {x: 2, y: 2, z: 2}
+  m_LocalPosition: {x: 0.0019273, y: -0.19406, z: -0.8013}
+  m_LocalScale: {x: 4, y: 4, z: 4}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7359993287044885954}
@@ -178,7 +178,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   grabbableSO: {fileID: 11400000, guid: ba4e07dd7023fa946afdb2a217a3d5c6, type: 2}
-  player: {fileID: 0}
   _light: {fileID: 5388993769250985451}
 --- !u!1 &6393894050111671800
 GameObject:
@@ -224,10 +223,10 @@ Light:
   serializedVersion: 11
   m_Type: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 1
-  m_Range: 10
-  m_SpotAngle: 98.53922
-  m_InnerSpotAngle: 90.341286
+  m_Intensity: 5
+  m_Range: 20
+  m_SpotAngle: 36.896862
+  m_InnerSpotAngle: 25.142637
   m_CookieSize: 10
   m_Shadows:
     m_Type: 0
