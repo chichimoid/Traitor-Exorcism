@@ -1,12 +1,16 @@
-﻿using Unity.Netcode;
+﻿using System;
+using Unity.Netcode;
+using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Maze.GameCycle
 {
     public class Phase3Ender : NetworkBehaviour
     {
-        private void Start()
+        [SerializeField] private LeverManager leverManager;
+        public void Subscribe()
         {
-            
+            leverManager.OnAllLeversPulled += End;
         }
         
         private void End()

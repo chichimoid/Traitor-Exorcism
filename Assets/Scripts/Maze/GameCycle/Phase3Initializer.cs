@@ -6,6 +6,8 @@ namespace Maze.GameCycle
     {
         public void Init()
         {
+            LeverManager.Instance.ShowLevers();
+            
             GlobalDebugger.Instance.Log($"Phase 3 initialized.");
         }
     }

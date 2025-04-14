@@ -250,9 +250,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  leverHandle: {fileID: 9078037237241554317}
   rotationAngle: 90
   rotationSpeed: 5
+  yOffsetWhenHidden: 10
+  showMoveSpeed: 2
+  leverPillar: {fileID: 1577609632647162967}
+  leverHandle: {fileID: 9078037237241554317}
   door: {fileID: 0}
 --- !u!65 &5880398312996128114
 BoxCollider:

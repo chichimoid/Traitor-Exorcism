@@ -25,9 +25,7 @@ namespace Voting
 
             if (_spawnedPlayers.Value == NetworkManager.Singleton.ConnectedClients.Count)
             {
-                votingPhaseInitializer.Init();
                 GameManager.Instance.OnVotingSceneStarted(votingPhaseInitializer, votingPhaseEnder);
-                
             }
         }
     }

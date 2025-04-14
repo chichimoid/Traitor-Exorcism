@@ -12,7 +12,7 @@ namespace Voting
     {
         [SerializeField] private ServerTimer serverTimer;
 
-        private void Start()
+        public void Subscribe()
         {
             serverTimer.OnTimeUp += End;
         }

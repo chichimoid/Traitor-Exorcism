@@ -57,6 +57,7 @@ namespace Maze
             serializer.SerializeValue(ref visited);
             serializer.SerializeValue(ref zone);
             serializer.SerializeValue(ref roomNumber);
+            serializer.SerializeValue(ref isLeverRoom);
         }
     }
 

@@ -1646,6 +1646,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   votingPhaseInitializer: {fileID: 346573868}
+  votingPhaseEnder: {fileID: 1484929237}
 --- !u!4 &2014489343
 Transform:
   m_ObjectHideFlags: 0

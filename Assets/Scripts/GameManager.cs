@@ -84,6 +84,8 @@ namespace Maze
             if (_phase1Initializer == null) throw new Exception("Phase initializer not found");
             Debug.Log("Starting phase 1...");
             _phase1Initializer.Init();
+            
+            _phase1Ender.Subscribe();
         }
 
         /// <summary>
@@ -120,7 +122,7 @@ namespace Maze
             Debug.Log("Starting phase 3...");
             _phase3Initializer.Init();
             
-            // TBA: Monster player turns to monster and stuff.
+            _phase3Ender.Subscribe();
         }
         
         private void StartVotingScene()
@@ -155,6 +157,8 @@ namespace Maze
             if (_votingPhaseInitializer == null) throw new Exception("Phase initializer not found");
             Debug.Log("Starting voting phase...");
             _votingPhaseInitializer.Init();
+            
+            _votingPhaseEnder.Subscribe();
         }
         
         /// <summary>
