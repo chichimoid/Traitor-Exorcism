@@ -13,6 +13,8 @@ namespace ObjectScripts
         [SerializeField] private float rotationSpeed = 5f;
         [SerializeField] private float yOffsetWhenHidden;
         [SerializeField] private float showMoveSpeed;
+        [SerializeField] private AudioSource audioSource;
+        
 
         [Header("References")] 
         [SerializeField] private Transform leverPillar;
@@ -23,6 +25,7 @@ namespace ObjectScripts
         private Quaternion _downRotation;
         private Quaternion _upRotation;
         private bool _isMoving = false;
+        private bool _hasMoved = false;
 
         private void Start()
         {
@@ -31,6 +34,13 @@ namespace ObjectScripts
             
             LeverManager.Instance.OnShowLevers += Show;
             Hide();
+        }
+        
+        private void LeverActionSound()
+        {
+            _isUp = !_isUp;
+            StartCoroutine(RotateLever());
+            audioSource.Stop();
         }
         
         private void LeverActionDoor()
@@ -47,6 +57,7 @@ namespace ObjectScripts
             _isUp = !_isUp;
             StartCoroutine(RotateLever());
             Debug.Log("Lever pressed!");
+            _hasMoved = true;
         }
 
         public void Interact(Transform interactor)
@@ -63,6 +74,7 @@ namespace ObjectScripts
         public void Show()
         {
             StartCoroutine(ShowLeverCoroutine());
+            audioSource.Play();
         }
 
         private System.Collections.IEnumerator ShowLeverCoroutine()
@@ -85,6 +97,10 @@ namespace ObjectScripts
                 if (door is not null)
                 {
                     LeverActionDoor();
+                } 
+                else if (audioSource is not null)
+                {
+                    LeverActionSound();
                 }
                 else
                 {
@@ -99,7 +115,7 @@ namespace ObjectScripts
             LeverManager.Instance.IncrementLeverCount();
         }
 
-        public bool CanInteract() => !_isMoving && GameManager.Instance.Phase == GamePhase.Phase3;
+        public bool CanInteract() => !_isMoving && !_hasMoved && GameManager.Instance.Phase == GamePhase.Phase3;
 
         private System.Collections.IEnumerator RotateLever()
         {

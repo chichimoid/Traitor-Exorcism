@@ -15,9 +15,8 @@ namespace Maze.GameCycle
         
         private ulong GiveRoles()
         {
-            //var monsterIdIndex = Random.Range(0, NetworkManager.Singleton.ConnectedClientsList.Count);
-            //var monsterId = NetworkManager.Singleton.ConnectedClientsIds[monsterIdIndex];
-            ulong monsterId = 1;
+            var monsterIdIndex = Random.Range(0, NetworkManager.Singleton.ConnectedClientsList.Count);
+            var monsterId = NetworkManager.Singleton.ConnectedClientsIds[monsterIdIndex];
             
             GiveRolesRpc(monsterId);
 

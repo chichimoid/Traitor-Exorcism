@@ -72,8 +72,8 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: c2b20412de73e49e18b64d7b88dc9aa6, type: 3}
   m_Resource: {fileID: 8300000, guid: c2b20412de73e49e18b64d7b88dc9aa6, type: 3}
-  m_PlayOnAwake: 1
-  m_Volume: 0.669
+  m_PlayOnAwake: 0
+  m_Volume: 0.4
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -370,10 +370,10 @@ MonoBehaviour:
   rotationSpeed: 5
   yOffsetWhenHidden: 10
   showMoveSpeed: 2
+  audioSource: {fileID: 5684287322128466738}
   leverPillar: {fileID: 1577609632647162967}
   leverHandle: {fileID: 9078037237241554317}
   door: {fileID: 0}
-  audioSource: {fileID: 5684287322128466738}
 --- !u!65 &5880398312996128114
 BoxCollider:
   m_ObjectHideFlags: 0
