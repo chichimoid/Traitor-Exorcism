@@ -18,10 +18,16 @@ namespace PlayerScripts
 
         private bool _isDead = false;
 
+        public event Action<float> OnHealthChanged;
+
         public float Value
         {
             get => _fixedIntervalFloat.Value;
-            private set => _fixedIntervalFloat.Value = value;
+            private set
+            {
+                _fixedIntervalFloat.Value = Mathf.Clamp(value, 0, maxValue);
+                OnHealthChanged?.Invoke(_fixedIntervalFloat.Value);
+            }
         }
 
         public float MaxValue => maxValue;

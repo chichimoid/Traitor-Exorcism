@@ -18,12 +18,19 @@ namespace PlayerScripts
         private FixedIntervalFloat _fixedIntervalFloat;
         private PlayerRayCaster _playerRayCaster;
         
+        
+        public event Action<float> OnInfectionChanged;
+
         public float Value
         {
             get => _fixedIntervalFloat.Value;
-            private set => _fixedIntervalFloat.Value = value;
+            private set
+            {
+                _fixedIntervalFloat.Value = Mathf.Clamp(value, 0, maxValue);
+                OnInfectionChanged?.Invoke(_fixedIntervalFloat.Value);
+            }
         }
-        
+
         public float MaxValue => maxValue;
         
         private void Start()
