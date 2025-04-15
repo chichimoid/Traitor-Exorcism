@@ -3,7 +3,6 @@ using System.Collections;
 using NetworkHelperScripts;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace PlayerScripts
 {
@@ -16,6 +15,8 @@ namespace PlayerScripts
         
         private FixedIntervalFloat _fixedIntervalFloat;
         private Coroutine _regenAfterDelayCoroutine;
+
+        private bool _isDead = false;
 
         public float Value
         {
@@ -30,11 +31,21 @@ namespace PlayerScripts
             if (!IsOwner) return;
             
             _fixedIntervalFloat = new FixedIntervalFloat(maxValue, maxValue);
+            GetComponent<PlayerInfection>().OnPlayerFullyInfected += () => OnHealthZero?.Invoke();
         }
+
+        private void OnDisable()
+        {
+            if (_regenAfterDelayCoroutine != null)
+            {
+                StopCoroutine(_regenAfterDelayCoroutine);
+            }
+        }
+        
         /// <param name="value">positive</param>
         public void Regen(float value)
         {
-            if (!IsOwner) return;
+            if (!IsOwner || _isDead) return;
             
             if (value <= 0) throw new ArgumentException("<value> must be positive.");
             
@@ -44,7 +55,7 @@ namespace PlayerScripts
         /// <param name="value">positive</param>
         public void Damage(float value)
         {
-            if (!IsOwner) return;
+            if (!IsOwner || _isDead) return;
             
             if (value <= 0) throw new ArgumentException("<value> must be positive.");
             
@@ -55,7 +66,9 @@ namespace PlayerScripts
             
             Value -= value;
             GlobalDebugger.Instance.Log($"Player {NetworkManager.Singleton.LocalClientId} health changed: {Value}");
+            
             CheckDead();
+            if (_isDead) return;
             
             _regenAfterDelayCoroutine = StartCoroutine(RegenAfterDelayCoroutine());
         }
@@ -75,13 +88,14 @@ namespace PlayerScripts
         {
             if (Value == 0f)
             {
-                OnPlayerDied?.Invoke();
+                _isDead = true;
+                Value = maxValue;
+                OnHealthZero?.Invoke();
             }
         }
 
-        public delegate void OnPlayerDiedDelegate();
-
-        public event OnPlayerDiedDelegate OnPlayerDied;
+        public delegate void OnHealthZeroDelegate();
+        public event OnHealthZeroDelegate OnHealthZero;
 
     }
 }

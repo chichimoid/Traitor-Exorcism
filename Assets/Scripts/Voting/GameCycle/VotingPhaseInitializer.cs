@@ -1,5 +1,4 @@
 ﻿using System;
-using Maze;
 using NetworkHelperScripts;
 using PlayerScripts;
 using Unity.Netcode;
@@ -32,12 +31,15 @@ namespace Voting.GameCycle
             
             for (int i = 0; i < len; i++)
             {
-                spawnedNetworkObject = Instantiate(voteDisplayerPrefab).GetComponent<NetworkObject>();
-                spawnedNetworkObject.Spawn(true);
+                ulong id = NetworkManager.Singleton.ConnectedClientsIds[i];
+                if (GameManager.Instance.AlivePlayersIds.Contains(id))
+                {
+                    spawnedNetworkObject = Instantiate(voteDisplayerPrefab).GetComponent<NetworkObject>();
+                    spawnedNetworkObject.Spawn(true);
+                    spawnedNetworkObject.GetComponent<VoteDisplayer>().BoundId = id;
+                }
                 
-                InitClientVotingTargetRpc(i, len, spawnedNetworkObject, RpcTarget.Single(NetworkManager.Singleton.ConnectedClientsIds[i], RpcTargetUse.Temp));
-                
-                spawnedNetworkObject.GetComponent<VoteDisplayer>().BoundId = NetworkManager.Singleton.ConnectedClientsIds[i];
+                InitClientVotingTargetRpc(i, len, spawnedNetworkObject, RpcTarget.Single(id, RpcTargetUse.Temp));
             }
             
             serverTimer.StartTimer(votingTimeSeconds);
@@ -51,10 +53,13 @@ namespace Voting.GameCycle
             var playerObject = NetworkManager.Singleton.LocalClient.PlayerObject;
             TeleportPlayerToVotingCircle(playerObject, i, len);
             
-            voteDisplayerReference.TryGet(out var voteDisplayerObject);
-            SetFollowTransformRpc(voteDisplayerObject, playerObject);
+            if (GameManager.Instance.AlivePlayersIds.Contains((ulong)i))
+            {
+                voteDisplayerReference.TryGet(out var voteDisplayerObject);
+                SetFollowTransformRpc(voteDisplayerObject, playerObject);
             
-            playerObject.GetComponent<PlayerVoter>().enabled = true;
+                playerObject.GetComponent<PlayerVoter>().enabled = true;
+            }
         }
 
         private void TeleportPlayerToVotingCircle(NetworkObject playerObject, int i, int len)

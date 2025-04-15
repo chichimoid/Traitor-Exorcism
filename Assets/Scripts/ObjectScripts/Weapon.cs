@@ -1,6 +1,4 @@
-﻿using Unity.Netcode;
-
-namespace ObjectScripts
+﻿namespace ObjectScripts
 {
     public abstract class Weapon : Usable
     {

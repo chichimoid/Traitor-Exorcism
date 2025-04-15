@@ -1,6 +1,5 @@
-﻿using Unity.VisualScripting;
+﻿using PlayerScripts.UI;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace PlayerScripts
 {
@@ -8,7 +7,6 @@ namespace PlayerScripts
     {
         private PlayerInteract _playerInteract;
         private PlayerAttack _playerAttack;
-        
         private PlayerMovement _playerMovement;
         private PlayerRotation _playerRotation;
         private Rigidbody _rigidbody;
@@ -77,6 +75,14 @@ namespace PlayerScripts
         {
             _playerInteract.enabled = true;
             _playerAttack.enabled = true;
+        }
+        
+        public void LockActivatableUI()
+        {
+            PlayerUI.Instance.EmoteWheelUI.Hide();
+            PlayerUI.Instance.PauseMenuUI.enabled = false;
+            PlayerUI.Instance.PauseMenuUI.Hide();
+            PlayerUI.Instance.EmoteWheelUI.enabled = false;
         }
     }
 }

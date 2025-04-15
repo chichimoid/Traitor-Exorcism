@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 5147505640750308981}
   - component: {fileID: 510345444601732351}
   - component: {fileID: 3549928694805106429}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: KnifePrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}

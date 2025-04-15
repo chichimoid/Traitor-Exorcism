@@ -932,11 +932,11 @@ PlayerSettings:
   captureStartupLogs: {}
   activeInputHandler: 2
   windowsGamepadBackendHint: 0
-  cloudProjectId: 36fab8a0-1ec4-4976-ab0c-f45603e5cdff
+  cloudProjectId: 7b5b8027-3521-4721-8a92-c258cc13b2d4
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
   projectName: TraitorExorcismGame
-  organizationId: skovorodkok20363
+  organizationId: chichimoid
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
   hmiLoadingImage: {fileID: 0}

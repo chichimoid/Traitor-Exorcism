@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 3143648609032461208}
   - component: {fileID: 595454142405376695}
   - component: {fileID: 3189192523484698838}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: FlashlightPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}

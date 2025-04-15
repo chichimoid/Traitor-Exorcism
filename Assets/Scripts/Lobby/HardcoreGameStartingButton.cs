@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Lobby
 {
-    public class GameStartingButton : NetworkBehaviour, IInteractable
+    public class HardcoreGameStartingButton : NetworkBehaviour, IInteractable
     {
         [SerializeField] private string clientAttemptMsg;
         private TextDisplayer _textDisplayer;
@@ -22,7 +22,7 @@ namespace Lobby
                 return;
             }
             
-            GameManager.Instance.StartGame(false);
+            GameManager.Instance.StartGame(true);
         }
     }
 }

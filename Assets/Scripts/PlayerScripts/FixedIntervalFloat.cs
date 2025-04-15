@@ -1,5 +1,4 @@
-﻿using Unity.Mathematics.Geometry;
-using Unity.Netcode;
+﻿using Unity.Netcode;
 using UnityEngine;
 
 namespace PlayerScripts

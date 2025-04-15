@@ -1,7 +1,6 @@
 ﻿using NetworkHelperScripts;
 using PlayerScripts;
 using Unity.Netcode;
-using UnityEngine;
 
 namespace Maze.GameCycle
 {
@@ -11,17 +10,21 @@ namespace Maze.GameCycle
         {
             LeverManager.Instance.ShowLevers();
             
-            SetMonsterMeshTargetRpc(RpcTarget.Single(GameManager.GetMonsterId(), RpcTargetUse.Temp));
+            TurnToMonsterTargetRpc(RpcTarget.Single(GameManager.GetMonsterId(), RpcTargetUse.Temp));
             
             GlobalDebugger.Instance.Log($"Phase 3 initialized.");
         }
 
         [Rpc(SendTo.SpecifiedInParams)]
-        private void SetMonsterMeshTargetRpc(RpcParams rpcParams)
+        private void TurnToMonsterTargetRpc(RpcParams rpcParams)
         {
             var networkPlayer = NetworkPlayer.GetLocalInstance();
             var playerMesh = networkPlayer.GetComponent<PlayerMesh>();
             playerMesh.SetMonsterMaterial();
+            var playerAttack = networkPlayer.GetComponent<PlayerAttack>();
+            playerAttack.ToMonsterMultiplier();
+            var playerMovement = networkPlayer.GetComponent<PlayerMovement>();
+            playerMovement.ToMonsterMultiplier();
         }
     }
 }

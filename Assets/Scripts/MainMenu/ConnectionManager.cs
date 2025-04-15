@@ -10,26 +10,24 @@ namespace MainMenu
     {
         [Header("Config")]
         [SerializeField] int maxConnections;
-        public Allocation HostAllocation { get; private set; }
         public string LobbyCode { get; private set; }
-    
         public static ConnectionManager Instance { get; private set; }
 
         private void Awake()
         {
             Instance = this;
         
-            DontDestroyOnLoad(this.gameObject);
+            DontDestroyOnLoad(gameObject);
         }
 
         public async void CreateRelay()
         {
-            HostAllocation = await RelayService.Instance.CreateAllocationAsync(maxConnections);
-            LobbyCode = await RelayService.Instance.GetJoinCodeAsync(HostAllocation.AllocationId);
+            var hostAllocation = await RelayService.Instance.CreateAllocationAsync(maxConnections);
+            LobbyCode = await RelayService.Instance.GetJoinCodeAsync(hostAllocation.AllocationId);
 
             // Changed according to Unity documentation due to deprecation of Relay package
             // var relayServerData = new RelayServerData(allocation, "dtls");
-            var relayServerData = AllocationUtils.ToRelayServerData(HostAllocation, "dtls");
+            var relayServerData = AllocationUtils.ToRelayServerData(hostAllocation, "dtls");
         
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
         

@@ -1,5 +1,3 @@
-using PlayerScripts;
-using Unity.Netcode;
 using UnityEngine;
 
 namespace ObjectScripts
@@ -11,7 +9,7 @@ namespace ObjectScripts
         protected override void UseFunctional()
         {
             Debug.Log($"Deal damage to near player: {Damage}");
-            // Прописать анимацию ножа
+            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
         }
     }
 }

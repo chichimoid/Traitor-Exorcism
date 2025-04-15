@@ -1,4 +1,3 @@
-using System;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -10,6 +9,9 @@ namespace PlayerScripts
         [Header("Configure")]
         [SerializeField] private float moveSpeed;
         [SerializeField] private float sprintSpeed;
+        [SerializeField] private float monsterMultiplier;
+        
+        private float _multiplier = 1;
     
         private Rigidbody _playerRigidbody;
         private PlayerInputActions _inputActions;
@@ -53,14 +55,18 @@ namespace PlayerScripts
         private void MovePlayer(Vector2 moveVector, bool isSprinting)
         {
             _playerRigidbody.linearVelocity = transform.TransformDirection(new Vector3(
-                moveVector.x * (isSprinting ? sprintSpeed : moveSpeed),
+                moveVector.x * (isSprinting ? sprintSpeed : moveSpeed) * _multiplier,
                 _playerRigidbody.linearVelocity.y, 
-                moveVector.y * (isSprinting ? sprintSpeed : moveSpeed)
-            ));
+                moveVector.y * (isSprinting ? sprintSpeed : moveSpeed) * _multiplier));
             
             // Alternative movement system (if player has no RigidBody)
             //var moveVector = playerInputActions.Player.Move.ReadValue<Vector2>();
             //transform.Translate( moveSpeed * new Vector3(moveVector.x, 0f, moveVector.y), Space.Self);
+        }
+
+        public void ToMonsterMultiplier()
+        {
+            _multiplier = monsterMultiplier;
         }
         public delegate void OnPlayerIsRunningDelegate();
         public event OnPlayerIsRunningDelegate OnPlayerIsRunning;

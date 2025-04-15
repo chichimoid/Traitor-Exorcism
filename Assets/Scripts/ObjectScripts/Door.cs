@@ -1,4 +1,3 @@
-using ObjectScripts;
 using UnityEngine;
 using Unity.Netcode;
 namespace ObjectScripts

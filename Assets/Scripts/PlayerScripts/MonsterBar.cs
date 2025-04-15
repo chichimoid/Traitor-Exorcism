@@ -3,7 +3,6 @@ using System.Collections;
 using NetworkHelperScripts;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace PlayerScripts
 {

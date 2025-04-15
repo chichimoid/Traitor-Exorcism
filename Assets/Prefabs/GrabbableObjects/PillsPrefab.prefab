@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 5230730601949885243}
   - component: {fileID: 3751979868914298580}
   - component: {fileID: 5925558041638297291}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: PillsPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -102,7 +102,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3801399595
+  GlobalObjectIdHash: 3496584152
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1

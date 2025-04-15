@@ -1,10 +1,7 @@
-﻿using ObjectScripts;
-using PlayerScripts;
-using Unity.Netcode;
-using UnityEngine;
-using UnityEngine.InputSystem;
+﻿using UnityEngine;
+using Voting;
 
-namespace Voting
+namespace PlayerScripts
 {
     public class PlayerVoter : MonoBehaviour
     {

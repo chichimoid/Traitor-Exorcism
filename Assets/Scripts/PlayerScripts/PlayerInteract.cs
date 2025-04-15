@@ -2,7 +2,6 @@ using ObjectScripts;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.Serialization;
 
 namespace PlayerScripts
 {
@@ -25,7 +24,6 @@ namespace PlayerScripts
         public float InteractionRange => interactionRange;
         public Transform HoldPointTransformMain => holdPointTransformMain;
         public Transform HoldPointTransformSecond => holdPointTransformSecond;
-
 
         private void Start()
         {

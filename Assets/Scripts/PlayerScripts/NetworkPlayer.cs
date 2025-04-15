@@ -1,8 +1,8 @@
 ﻿using JetBrains.Annotations;
+using NetworkHelperScripts;
 using ObjectScripts;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace PlayerScripts
 {
@@ -11,6 +11,7 @@ namespace PlayerScripts
         InLobby,
         InMaze,
         InVoting,
+        Dead,
     }
 
     public enum PlayerRole
@@ -45,6 +46,7 @@ namespace PlayerScripts
                     case PlayerState.InLobby: OnPlayerStateToLobby?.Invoke(); break;
                     case PlayerState.InMaze: OnPlayerStateToMaze?.Invoke(); break;
                     case PlayerState.InVoting: OnPlayerStateToVoting?.Invoke(); break;
+                    case PlayerState.Dead: OnPlayerStateDead?.Invoke(); break;
                 }
                 _state.Value = value;
             }
@@ -103,6 +105,14 @@ namespace PlayerScripts
 
             Id = NetworkManager.Singleton.LocalClientId;
             State = PlayerState.InLobby;
+
+            GetComponent<PlayerHealth>().OnHealthZero += HealthZeroServerRpc;
+        }
+
+        [Rpc(SendTo.Server)]
+        private void HealthZeroServerRpc()
+        {
+            OnPlayerDied?.Invoke();
         }
         
         public static NetworkPlayer GetLocalInstance()
@@ -122,8 +132,12 @@ namespace PlayerScripts
         public event OnPlayerStateChangedDelegate OnPlayerStateFromMaze;
         public event OnPlayerStateChangedDelegate OnPlayerStateToVoting;
         public event OnPlayerStateChangedDelegate OnPlayerStateFromVoting;
+        public event OnPlayerStateChangedDelegate OnPlayerStateDead;
 
         public delegate void OnPlayerRoleSetDelegate(PlayerRole role);
         public event OnPlayerRoleSetDelegate OnPlayerRoleSet;
+        
+        public delegate void OnPlayerDiedDelegate();
+        public event OnPlayerDiedDelegate OnPlayerDied;
     }
 }

@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace PlayerScripts.UI
 {
@@ -12,18 +11,32 @@ namespace PlayerScripts.UI
         private void Start()
         {
             _reachableObjectDetector = NetworkPlayer.GetLocalInstance().GetComponent<ReachableObjectDetector>();
-            _reachableObjectDetector.OnInteractableFound += Show;
-            _reachableObjectDetector.OnInteractableLost += Hide;
 
             interactionUIObject.SetActive(false);
+            
+            OnEnable();
         }
 
-        private void Show()
+        private void OnEnable()
+        {
+            if (!didStart) return;
+            
+            _reachableObjectDetector.OnInteractableFound += Show;
+            _reachableObjectDetector.OnInteractableLost += Hide;
+        }
+
+        private void OnDisable()
+        {
+            _reachableObjectDetector.OnInteractableFound -= Show;
+            _reachableObjectDetector.OnInteractableLost -= Hide;
+        }
+
+        public void Show()
         {
             interactionUIObject.SetActive(true);
         }
         
-        private void Hide()
+        public void Hide()
         {
             interactionUIObject.SetActive(false);
         }

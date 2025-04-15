@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using TMPro;
-using Unity.Netcode;
 using UnityEngine;
 
 namespace PlayerScripts.UI

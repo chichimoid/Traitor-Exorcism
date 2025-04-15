@@ -5,8 +5,6 @@ namespace NetworkHelperScripts
 {
     public class SessionManager : NetworkBehaviour
     {
-        [SerializeField] private Transform gameManagerPrefab;
-        
         public static SessionManager Instance { get; private set; }
         private void Awake()
         {
@@ -31,7 +29,7 @@ namespace NetworkHelperScripts
             KickPlayerServerRpc(playerId);
         }
 
-        [Rpc(SendTo.Server)]
+        [Rpc(SendTo.Server, RequireOwnership = false)]
         private void KickPlayerServerRpc(ulong playerId)
         {
             NetworkManager.Singleton.DisconnectClient(playerId);

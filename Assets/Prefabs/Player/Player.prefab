@@ -279,7 +279,7 @@ GameObject:
   - component: {fileID: 4336482414689770037}
   - component: {fileID: 2062729248973738123}
   - component: {fileID: 3036088138234217332}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -302,6 +302,7 @@ Transform:
   - {fileID: 2967216200531195706}
   - {fileID: 6007813851276063219}
   - {fileID: 1042099072430833530}
+  - {fileID: 4826696649421311228}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!136 &8584104850188275711
@@ -317,7 +318,7 @@ CapsuleCollider:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
@@ -498,6 +499,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 60ede3e5d45900441a4380db80110f54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  raycastObstacle:
+    serializedVersion: 2
+    m_Bits: 1024
 --- !u!114 &4122445992884126514
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -531,6 +535,7 @@ MonoBehaviour:
   maxValue: 100
   proximityIncreaseTick: 0.5
   proximityIncreaseValue: 2
+  <PlayerInfectionCollider>k__BackingField: {fileID: 3549548044490775065}
 --- !u!114 &1413153615347095488
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -564,6 +569,7 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   moveSpeed: 7
   sprintSpeed: 12
+  monsterMultiplier: 1.5
 --- !u!114 &7799687200577962038
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -594,7 +600,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  maxValue: 10
+  maxValue: 30
   fillingTick: 1
   fillingValue: 1
 --- !u!114 &5078071764432592721
@@ -642,6 +648,7 @@ MonoBehaviour:
   meleeAttackRange: 3
   bareHandDamage: 3
   attackCooldownSeconds: 0.5
+  monsterMultiplier: 7
 --- !u!114 &2062729248973738123
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -955,6 +962,73 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!1 &5174474484499788299
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4826696649421311228}
+  - component: {fileID: 8009591340630926920}
+  - component: {fileID: 3549548044490775065}
+  m_Layer: 2
+  m_Name: InfectionCollider
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4826696649421311228
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5174474484499788299}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 39452889765503295}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!135 &8009591340630926920
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5174474484499788299}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 3.5
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &3549548044490775065
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5174474484499788299}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 501d082be4f1448aa1a2347424181fa6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
 --- !u!1 &8240505602961923560
 GameObject:
   m_ObjectHideFlags: 0

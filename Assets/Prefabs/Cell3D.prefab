@@ -110,15 +110,15 @@ MonoBehaviour:
     weight: 1
   items:
   - prefab: {fileID: 0}
-    weight: 40
+    weight: 185
   - prefab: {fileID: 1987713744733760, guid: 5af5082d208216c4bb164fd2587b0090, type: 3}
-    weight: 3
+    weight: 4
   - prefab: {fileID: 693183803092694530, guid: 367884cd371f0bc4b91c49da08f43859, type: 3}
-    weight: 3
+    weight: 6
   - prefab: {fileID: 4204161346691823529, guid: 954090c77299e20428a0fad8c4639049, type: 3}
     weight: 1
   - prefab: {fileID: 1985338178271116, guid: e38ddfeb22f20cd4b8485c8848294539, type: 3}
-    weight: 3
+    weight: 4
   - prefab: {fileID: 1329036786104595201, guid: acb5e9a1dc016f14a830aeb6350a7208, type: 3}
     weight: 2
 --- !u!114 &8879542961208221453
@@ -133,7 +133,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3600383241
+  GlobalObjectIdHash: 1209009523
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1

@@ -2,7 +2,6 @@
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Voting
 {

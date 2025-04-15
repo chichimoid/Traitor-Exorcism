@@ -9,7 +9,7 @@ public class SceneLoader : NetworkBehaviour
     {
         Instance = this;
         
-        DontDestroyOnLoad(this.gameObject);
+        DontDestroyOnLoad(gameObject);
     }
     public enum Scene
     {

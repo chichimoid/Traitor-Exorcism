@@ -1,13 +1,7 @@
-using System;
 using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Netcode;
-using Unity.Services.Authentication;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.Rendering;
-using UnityEngine.UIElements;
-using static Unity.Cinemachine.CinemachineSplineRoll;
 using Random = UnityEngine.Random;
 
 namespace Maze
@@ -242,11 +236,6 @@ namespace Maze
 
         private void ApplyRandomTransform(Transform targetTransform)
         {
-            if (PrefabUtility.IsPartOfPrefabAsset(targetTransform))
-            {
-                Debug.LogError("��������� �������� ������������ ������! ����������� Instantiate.");
-                return;
-            }
             Vector3 originalPosition = targetTransform.position;
             Quaternion originalRotation = targetTransform.rotation;
 
@@ -380,11 +369,6 @@ namespace Maze
 
         private void AdjustPrefabScale(GameObject prefabInstance, float minSize = 0.84f)
         {
-            if (PrefabUtility.IsPartOfPrefabAsset(prefabInstance))
-            {
-                Debug.LogError("��������� �������� ������������ ������! ����������� Instantiate.");
-                return;
-            }
             Renderer rend = prefabInstance.GetComponent<Renderer>();
             if (rend == null)
             {

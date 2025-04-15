@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Unity.Netcode;
 
@@ -19,7 +18,7 @@ namespace Voting
         {
             if (!IsServer) return;
             
-            for (int i = 0; i < NetworkManager.Singleton.ConnectedClientsIds.Count; i++)
+            for (int i = 0; i < GameManager.Instance.AlivePlayersIds.Count; i++)
             {
                 Votes.Add(0);
             }
@@ -33,7 +32,7 @@ namespace Voting
         [Rpc(SendTo.Server)]
         private void VoteServerRpc(ulong id)
         {
-            ++Votes[NetworkManager.Singleton.ConnectedClientsIds.ToList().IndexOf(id)];
+            ++Votes[GameManager.Instance.AlivePlayersIds.IndexOf(id)];
             
             VoteRpc(id);
         }
@@ -52,7 +51,7 @@ namespace Voting
         [Rpc(SendTo.Server)]
         private void UnVoteServerRpc(ulong id)
         {
-            --Votes[NetworkManager.Singleton.ConnectedClientsIds.ToList().IndexOf(id)];
+            --Votes[GameManager.Instance.AlivePlayersIds.IndexOf(id)];
             
             UnVoteRpc(id);
         }

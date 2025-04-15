@@ -1,9 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections;
 using NetworkHelperScripts;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace PlayerScripts
 {
@@ -12,9 +12,11 @@ namespace PlayerScripts
         [SerializeField] private float maxValue = 100f;
         [SerializeField] private float proximityIncreaseTick = 0.5f;
         [SerializeField] private float proximityIncreaseValue = 1f;
+        [field:SerializeField] public PlayerInfectionCollider PlayerInfectionCollider { get; private set;}
         
+        private readonly Stack<Coroutine> _infectingPlayers = new();
         private FixedIntervalFloat _fixedIntervalFloat;
-        private Coroutine _regenIncreaseCoroutine;
+        private PlayerRayCaster _playerRayCaster;
         
         public float Value
         {
@@ -28,7 +30,32 @@ namespace PlayerScripts
         {
             if (!IsOwner) return;
             
+            _playerRayCaster = GetComponent<PlayerRayCaster>();
+            
             _fixedIntervalFloat = new FixedIntervalFloat(0, maxValue);
+            
+            PlayerInfectionCollider.OnPlayerFound += StartInfecting;
+            PlayerInfectionCollider.OnPlayerLost += StopInfecting;
+        }
+
+        private void OnDisable()
+        {
+            while (_infectingPlayers.Count > 0)
+            {
+                StopCoroutine(_infectingPlayers.Pop());
+            }
+        }
+
+        private void StartInfecting(Collider other)
+        {
+            var coroutine = StartCoroutine(ProximityIncreaseCoroutine(other)); 
+            _infectingPlayers.Push(coroutine);
+        }
+        
+        private void StopInfecting(Collider other)
+        {
+            if (_infectingPlayers.Count == 0) return;
+            StopCoroutine(_infectingPlayers.Pop());
         }
         
         /// <param name="value">positive</param>
@@ -40,6 +67,8 @@ namespace PlayerScripts
             
             Value += value;
             GlobalDebugger.Instance.Log($"Player {NetworkManager.Singleton.LocalClientId} infection level changed: {Value}");
+            
+            CheckInfected();
         }
         
         /// <param name="value">positive</param>
@@ -49,22 +78,18 @@ namespace PlayerScripts
             
             if (value <= 0) throw new ArgumentException("<value> must be positive.");
             
-            if (_regenIncreaseCoroutine != null)
-            {
-                StopCoroutine(_regenIncreaseCoroutine);
-            }
-            
             Value -= value;
             GlobalDebugger.Instance.Log($"Player {NetworkManager.Singleton.LocalClientId} infection level changed: {Value}");
-            
-            CheckInfected();
         }
         
-        private IEnumerator ProximityIncreaseCoroutine()
+        public IEnumerator ProximityIncreaseCoroutine(Collider other)
         {
             while (Value < maxValue)
             {
-                Increase(proximityIncreaseValue);
+                if (!_playerRayCaster.PlayerObstacleRayCast(out var hit, other.transform))
+                {
+                    Increase(proximityIncreaseValue);
+                }
                 yield return new WaitForSeconds(proximityIncreaseTick);
             }
         }
@@ -73,6 +98,7 @@ namespace PlayerScripts
         {
             if (_fixedIntervalFloat.Value >= maxValue)
             {
+                Value = 0;
                 OnPlayerFullyInfected?.Invoke();
             }
         }

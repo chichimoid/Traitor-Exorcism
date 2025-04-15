@@ -1,9 +1,7 @@
 ﻿using Maze.GameCycle;
 using PlayerScripts;
 using Unity.Netcode;
-using Unity.VisualScripting;
 using UnityEngine;
-using Voting;
 
 namespace Maze
 {
@@ -55,7 +53,7 @@ namespace Maze
             _mazeData.Value = new MazeData(width, length);
             var generator = new MazeGenerator();
             var mazeValue = _mazeData.Value;
-            mazeValue.MazeGeneratorCells = generator.GenerateMaze(width, length);
+            mazeValue.MazeGeneratorCells = generator.GenerateMaze(width, length, GameManager.Instance.IsHardcore);
             _mazeData.Value = mazeValue;
             
             var spawnedObj = Instantiate(mazeSpawnerPrefab);

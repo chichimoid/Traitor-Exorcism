@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using ObjectScripts;
 using Unity.Netcode;
-using Unity.Networking.Transport;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -13,6 +12,9 @@ namespace PlayerScripts
         [SerializeField] private float meleeAttackRange;
         [SerializeField] private float bareHandDamage;
         [SerializeField] private float attackCooldownSeconds;
+        [SerializeField] private float monsterMultiplier;
+
+        private float _multiplier = 1;
         
         private NetworkPlayer _networkPlayer;
         private PlayerInputActions _inputActions;
@@ -57,7 +59,7 @@ namespace PlayerScripts
                 {
                     var heldObj = _networkPlayer.HeldObjMain;
 
-                    var attackDamage = (heldObj as Weapon)?.Damage ?? bareHandDamage;
+                    var attackDamage = ((heldObj as Weapon)?.Damage ?? bareHandDamage) * _multiplier;
                     
                     StartCoroutine(AttackCooldownCoroutine());
 
@@ -79,6 +81,11 @@ namespace PlayerScripts
             _isOnCooldown = true;
             yield return new WaitForSeconds(attackCooldownSeconds);
             _isOnCooldown = false;
+        }
+
+        public void ToMonsterMultiplier()
+        {
+            _multiplier = monsterMultiplier;
         }
     }
 }

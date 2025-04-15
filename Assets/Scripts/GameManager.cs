@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using Maze.GameCycle;
 using PlayerScripts;
+using PlayerScripts.UI;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Voting.GameCycle;
 
 public enum GamePhase
@@ -12,19 +15,30 @@ public enum GamePhase
     Phase2,
     Phase3,
     Voting,
-    Conclusion,
+    Aftermath,
 }
     
 public class GameManager : NetworkBehaviour
 {
+    [SerializeField] private LayerMask spectatorIgnoreLayers;
+    [SerializeField] private int spectatorLayer;
+    
     private readonly NetworkVariable<GamePhase> _phase = new(GamePhase.None);
-
     public GamePhase Phase
     {
         get => _phase.Value; 
         private set => _phase.Value = value;
     }
-    public static GameManager Instance { get; private set; }
+    
+    public readonly NetworkList<ulong> AlivePlayersIds = new(new List<ulong>());
+    
+    private readonly NetworkVariable<bool> _isHardcore = new();
+
+    public bool IsHardcore
+    {
+        get => _isHardcore.Value;
+        private set => _isHardcore.Value = value;
+    }
         
     private Phase1Initializer _phase1Initializer;
     private Phase1Ender _phase1Ender;
@@ -34,14 +48,24 @@ public class GameManager : NetworkBehaviour
     private Phase3Ender _phase3Ender;
     private VotingPhaseInitializer _votingPhaseInitializer;
     private VotingPhaseEnder _votingPhaseEnder;
+    private AftermathPhaseInitializer _aftermathPhaseInitializer;
 
+    public static GameManager Instance { get; private set; }
     private void Awake()
     {
         Instance = this;
     }
-
-    public void StartGame()
+    
+    public void StartGame(bool isHardcore)
     {
+        IsHardcore = isHardcore;
+        
+        foreach (var id in NetworkManager.ConnectedClientsIds)
+        {
+            AlivePlayersIds.Add(id);
+            NetworkPlayer.GetInstance(id).GetComponent<NetworkPlayer>().OnPlayerDied += () => KillPlayer(id);
+        }
+        
         StartMazeScene();
     }
 
@@ -130,13 +154,14 @@ public class GameManager : NetworkBehaviour
         SceneLoader.Instance.LoadSceneGlobal(SceneLoader.Scene.Voting);
     }
         
-    public void OnVotingSceneStarted(VotingPhaseInitializer pVotingInit, VotingPhaseEnder pVotingEnd)
+    public void OnVotingSceneStarted(VotingPhaseInitializer pVotingInit, VotingPhaseEnder pVotingEnd, AftermathPhaseInitializer pAftermathInit)
     {
         if (!IsServer) return;
 
         _votingPhaseInitializer = pVotingInit;
         _votingPhaseEnder = pVotingEnd;
-        _votingPhaseEnder.OnVotingPhaseEnded += StartAftermath;
+        _aftermathPhaseInitializer = pAftermathInit;
+        _votingPhaseEnder.OnVotingPhaseEnded += StartAftermathPhase;
             
         StartVotingPhase();
     }
@@ -149,14 +174,14 @@ public class GameManager : NetworkBehaviour
     private void StartVotingPhase()
     {
         if (!IsServer) return;
-            
+        
         if (Phase != GamePhase.Phase3) throw new Exception($"Voting can only start after Phase3. Active phase is {Phase}");
         Phase = GamePhase.Voting;
-            
+        
         if (_votingPhaseInitializer == null) throw new Exception("Phase initializer not found");
         Debug.Log("Starting voting phase...");
         _votingPhaseInitializer.Init();
-            
+        
         _votingPhaseEnder.Subscribe();
     }
         
@@ -164,16 +189,18 @@ public class GameManager : NetworkBehaviour
     /// The aftermath phase.
     /// Some game over scene etc.
     /// </summary>
-    private void StartAftermath()
+    private void StartAftermathPhase(ulong votedPlayer)
     {
         if (!IsServer) return;
-            
+        
         if (Phase != GamePhase.Voting) throw new Exception($"Aftermath can only start after Voting. Active phase is {Phase}");
-            
-        Phase = GamePhase.Conclusion;
-            
+        
+        Phase = GamePhase.Aftermath;
+        
+        _aftermathPhaseInitializer.Init(votedPlayer);
+        
         Debug.Log("Starting aftermath...");
-            
+        
         // TBA: Some aftermath.
     }
 
@@ -204,6 +231,42 @@ public class GameManager : NetworkBehaviour
     [Rpc(SendTo.Everyone)]
     private void ChangePlayerStatesRpc(PlayerState state)
     {
-        NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<NetworkPlayer>().State = state;
+        NetworkPlayer.GetLocalInstance().State = state;
+    }
+    
+    // ReSharper disable Unity.PerformanceAnalysis
+    // This is just not called frequently.
+    private void KillPlayer(ulong playerId)
+    {
+        Debug.Log($"Killing player {playerId}...");
+
+        var networkPlayer = NetworkPlayer.GetLocalInstance();
+        networkPlayer.State = PlayerState.Dead;
+        AlivePlayersIds.Remove(playerId);
+
+        KillPlayerRpc(playerId);
+    }
+    
+    
+    [Rpc(SendTo.Everyone)]
+    private void KillPlayerRpc(ulong playerId)
+    {
+        var networkPlayer = NetworkPlayer.GetInstance(playerId);
+        networkPlayer.MeshObject.SetActive(false);
+        networkPlayer.gameObject.layer = spectatorLayer;
+        networkPlayer.GetComponent<Collider>().excludeLayers = spectatorIgnoreLayers;
+
+        if (playerId == NetworkManager.Singleton.LocalClientId)
+        {
+            networkPlayer.GetComponent<PlayerInfection>().enabled = false;
+            networkPlayer.GetComponent<PlayerHealth>().enabled = false;
+        
+            PlayerLocker.Instance.LockActions();
+        
+            PlayerUI.Instance.EmoteWheelUI.Hide();
+            PlayerUI.Instance.EmoteWheelUI.enabled = false;
+            PlayerUI.Instance.ReachableObjectDisplayUI.Hide();
+            PlayerUI.Instance.ReachableObjectDisplayUI.enabled = false;
+        }
     }
 }

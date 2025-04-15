@@ -2,7 +2,6 @@ using System;
 using Maze;
 using UnityEngine;
 using Unity.Netcode;
-using UnityEditorInternal;
 
 namespace ObjectScripts
 {

@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Netcode;
-using UnityEngine;
 
 namespace Maze
 {
@@ -92,7 +91,7 @@ namespace Maze
         public int RoomsInZone = 3;
         public int ZoneCount = 5;
 
-        public MazeGeneratorCell[,] GenerateMaze(int width, int length)
+        public MazeGeneratorCell[,] GenerateMaze(int width, int length, bool isHardcore)
         {
             MazeGeneratorCell[,] maze = new MazeGeneratorCell[width, length];
 
@@ -112,18 +111,30 @@ namespace Maze
             ZoneClustering.AssignZones(maze, centers);
             ZoneClustering.AssignLevers(maze, ZoneCount);
 
-            List<HashSet<MazeGeneratorCell>> sortedCells = Enumerable.Repeat(new HashSet<MazeGeneratorCell>(), ZoneCount).ToList();
-            for (int i = 0; i < maze.GetLength(0); ++i)
+            if (!isHardcore)
             {
-                for (int j = 0; j < maze.GetLength(1); ++j)
+                List<HashSet<MazeGeneratorCell>> sortedCells = Enumerable.Repeat(new HashSet<MazeGeneratorCell>(), ZoneCount).ToList();
+                for (int i = 0; i < maze.GetLength(0); ++i)
                 {
-                    sortedCells[maze[i, j].zone].Add(maze[i, j]);
+                    for (int j = 0; j < maze.GetLength(1); ++j)
+                    {
+                        sortedCells[maze[i, j].zone].Add(maze[i, j]);
+                    }
+                }
+            
+                ZoneClustering.AssignRoomsToZones(maze, sortedCells, 4);
+                ZoneClustering.EncloseRoomsWithDoors(maze);
+            } else
+            {
+                for (int i = 0; i < maze.GetLength(0); ++i)
+                {
+                    for (int j = 0; j < maze.GetLength(1); ++j)
+                    {
+                        maze[i, j].replaceableLeft = false;
+                        maze[i, j].replaceableBottom = false;
+                    }
                 }
             }
-
-            ZoneClustering.AssignRoomsToZones(maze, sortedCells, 4);
-            ZoneClustering.EncloseRoomsWithDoors(maze);
-
             return maze;
         }
 

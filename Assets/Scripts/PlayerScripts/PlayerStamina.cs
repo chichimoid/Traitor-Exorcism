@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections;
-using PlayerScripts;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.Serialization;
 
-public class PlayerStamina : NetworkBehaviour
+namespace PlayerScripts
 {
+    public class PlayerStamina : NetworkBehaviour
+    {
         [SerializeField] private float maxValue = 100f;
         [SerializeField] private float sprintWasteValue = 0.5f;
         [SerializeField] private float regenTick = 0.1f;
@@ -77,3 +77,4 @@ public class PlayerStamina : NetworkBehaviour
         public delegate void OnPlayerUnTiredDelegate();
         public event OnPlayerUnTiredDelegate OnPlayerUnTired;
     }
+}

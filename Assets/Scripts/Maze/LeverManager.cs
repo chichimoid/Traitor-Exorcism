@@ -1,5 +1,4 @@
-﻿using ObjectScripts;
-using Unity.Netcode;
+﻿using Unity.Netcode;
 
 namespace Maze
 {

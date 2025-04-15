@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Maze;
 using NetworkHelperScripts;
 using Unity.Netcode;
 using UnityEngine;
@@ -27,7 +26,7 @@ namespace Voting.GameCycle
                 GlobalDebugger.Instance.Log($"Player {playerToKickId} was not the monster.");
             }
             
-            OnVotingPhaseEnded?.Invoke();
+            OnVotingPhaseEnded?.Invoke(playerToKickId);
         }
         
         private ulong GetPlayerToKickId()
@@ -48,19 +47,19 @@ namespace Voting.GameCycle
                 if (voteCount > maxVotes)
                 {
                     maxVotesPlayersIds.Clear();
-                    maxVotesPlayersIds.Add(NetworkManager.Singleton.ConnectedClientsIds[i]);
+                    maxVotesPlayersIds.Add(GameManager.Instance.AlivePlayersIds[i]);
                     maxVotes = voteCount;
                 }
                 else if (voteCount == maxVotes)
                 {
-                    maxVotesPlayersIds.Add(NetworkManager.Singleton.ConnectedClientsIds[i]);
+                    maxVotesPlayersIds.Add(GameManager.Instance.AlivePlayersIds[i]);
                 }
             }
 
             return maxVotesPlayersIds;
         }
         
-        public delegate void OnVotingPhaseEndedDelegate();
+        public delegate void OnVotingPhaseEndedDelegate(ulong votedPlayerId);
         public event OnVotingPhaseEndedDelegate OnVotingPhaseEnded;
     }
 }

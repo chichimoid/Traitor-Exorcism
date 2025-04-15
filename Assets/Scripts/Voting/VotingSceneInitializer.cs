@@ -1,5 +1,4 @@
-﻿using Maze;
-using Unity.Netcode;
+﻿using Unity.Netcode;
 using UnityEngine;
 using Voting.GameCycle;
 
@@ -9,6 +8,7 @@ namespace Voting
     {
         [SerializeField] private VotingPhaseInitializer votingPhaseInitializer;
         [SerializeField] private VotingPhaseEnder votingPhaseEnder;
+        [SerializeField] private AftermathPhaseInitializer aftermathPhaseInitializer;
         
         private readonly NetworkVariable<int> _spawnedPlayers = new(0);
         
@@ -26,7 +26,7 @@ namespace Voting
 
             if (_spawnedPlayers.Value == NetworkManager.Singleton.ConnectedClients.Count)
             {
-                GameManager.Instance.OnVotingSceneStarted(votingPhaseInitializer, votingPhaseEnder);
+                GameManager.Instance.OnVotingSceneStarted(votingPhaseInitializer, votingPhaseEnder, aftermathPhaseInitializer);
             }
         }
     }

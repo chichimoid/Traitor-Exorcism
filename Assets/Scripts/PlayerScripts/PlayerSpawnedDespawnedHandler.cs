@@ -1,5 +1,4 @@
 ﻿using MainMenu;
-using Maze;
 using NetworkHelperScripts;
 using PlayerScripts.UI;
 using Unity.Netcode;
@@ -58,7 +57,7 @@ namespace PlayerScripts
             Cursor.lockState = CursorLockMode.None;
             
             Destroy(PlayerCamera.Instance?.gameObject);
-            Destroy(ConnectionManager.Instance?.gameObject);
+            Destroy(PlayerUI.Instance?.gameObject);
             
             SceneLoader.Instance.LoadSceneLocal(SceneLoader.Scene.MainMenu);
         }

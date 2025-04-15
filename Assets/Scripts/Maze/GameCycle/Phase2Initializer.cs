@@ -1,7 +1,6 @@
 ﻿using NetworkHelperScripts;
 using PlayerScripts;
 using Unity.Netcode;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Maze.GameCycle
@@ -15,8 +14,8 @@ namespace Maze.GameCycle
         
         private ulong GiveRoles()
         {
-            var monsterIdIndex = Random.Range(0, NetworkManager.Singleton.ConnectedClientsList.Count);
-            var monsterId = NetworkManager.Singleton.ConnectedClientsIds[monsterIdIndex];
+            var monsterIdIndex = Random.Range(0, GameManager.Instance.AlivePlayersIds.Count);
+            var monsterId = GameManager.Instance.AlivePlayersIds[monsterIdIndex];
             
             GiveRolesRpc(monsterId);
 
