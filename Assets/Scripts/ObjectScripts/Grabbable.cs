@@ -47,7 +47,9 @@ namespace ObjectScripts
             
             Player = interactor.transform;
         }
-
+        public virtual void UseAnimation()
+        {
+        }
         public void Drop()
         {
             DropRpc();

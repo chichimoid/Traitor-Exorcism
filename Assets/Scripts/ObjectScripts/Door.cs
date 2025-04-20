@@ -6,7 +6,9 @@ namespace ObjectScripts
     {
         [SerializeField] private Transform doorTransform; 
         [SerializeField] private float rotationAngle = 90f; 
-        [SerializeField] private float rotationSpeed = 3f; 
+        [SerializeField] private float rotationSpeed = 3f;
+
+        public AudioSource audioSource; 
 
         private Quaternion _closedRotation;
         private Quaternion _openRotation;
@@ -27,6 +29,10 @@ namespace ObjectScripts
         [Rpc(SendTo.Everyone)]
         private void InteractRpc()
         {
+            if (audioSource)
+            {
+                audioSource.PlayOneShot(audioSource.clip);
+            }
             MoveDoorLocal();
         }
         
@@ -36,6 +42,7 @@ namespace ObjectScripts
             {
                 _isOpen = !_isOpen;
                 StartCoroutine(RotateDoor());
+                
             }
         }
 

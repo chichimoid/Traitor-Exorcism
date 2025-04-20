@@ -2,6 +2,7 @@
 {
     public abstract class Weapon : Usable
     {
-         public abstract float Damage { get; protected set; }
+        public abstract float Damage { get; protected set; }
+       
     }
 }

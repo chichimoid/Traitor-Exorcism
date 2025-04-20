@@ -6,6 +6,9 @@ namespace ObjectScripts
     public class PillsUsable : Usable
     {
         private int _count = 3;
+        public AudioClip emptySound;
+        public AudioClip lastPillSound;
+
         protected override void UseFunctional()
         {
             if (_count == 0)
@@ -20,17 +23,13 @@ namespace ObjectScripts
             }
             else
             {
-                if (Player.GetComponent<PlayerInfection>().Value == 0)
-                {
-                    Debug.Log("�� ��������� �������! ���������� ��������.");
-                    return;
-                }
-
                 Player.GetComponent<PlayerInfection>().Decrease(10);
             }
             
             _count--;
-            Debug.Log($"Current infection: {Player.GetComponent<PlayerInfection>().Value}. �������� �������������: {_count}");
+            if (_count == 1) audioSource.clip = lastPillSound;
+            if (_count == 0) audioSource.clip = emptySound;
+            Debug.Log($"Current infection: {Player.GetComponent<PlayerInfection>().Value}. Pills left: {_count}");
         }
     }
 }

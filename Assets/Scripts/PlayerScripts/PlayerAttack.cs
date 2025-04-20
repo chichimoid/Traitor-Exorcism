@@ -52,7 +52,10 @@ namespace PlayerScripts
         private void Attack(InputAction.CallbackContext context)
         {
             Debug.Log("Attack");
-            
+            if(_networkPlayer.HeldObjMain is Weapon)
+            {
+                _networkPlayer.HeldObjMain.UseAnimation();
+            }
             if (_rayCaster.ViewPointRayCast(out var hit,  meleeAttackRange)) 
             {
                 if (hit.collider.TryGetComponent(out NetworkPlayer otherPlayer) && otherPlayer.State == PlayerState.InMaze && !_isOnCooldown)
