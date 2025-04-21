@@ -2,6 +2,7 @@
 using ObjectScripts;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.InputSystem;
 
 namespace PlayerScripts
@@ -13,6 +14,9 @@ namespace PlayerScripts
         [SerializeField] private float bareHandDamage;
         [SerializeField] private float attackCooldownSeconds;
         [SerializeField] private float monsterMultiplier;
+        
+        [Header("References")]
+        [SerializeField] private AudioSource audioSource;
 
         private float _multiplier = 1;
         
@@ -63,12 +67,29 @@ namespace PlayerScripts
                     var heldObj = _networkPlayer.HeldObjMain;
 
                     var attackDamage = ((heldObj as Weapon)?.Damage ?? bareHandDamage) * _multiplier;
-                    
+
                     StartCoroutine(AttackCooldownCoroutine());
+
+                    if(heldObj is Weapon)
+                    {
+                        (heldObj as Usable)?.Use();
+                    }
+                    else
+                    {
+                        PlaySoundRpc();
+                    }
+
 
                     AttackTargetRpc(otherPlayer.gameObject, attackDamage, RpcTarget.Single(otherPlayer.Id, RpcTargetUse.Temp));
                 }
             }
+        }
+
+        [Rpc(SendTo.Everyone)]
+
+        private void PlaySoundRpc()
+        {
+            if (audioSource) audioSource.PlayOneShot(audioSource.clip);
         }
 
         [Rpc(SendTo.SpecifiedInParams)]
