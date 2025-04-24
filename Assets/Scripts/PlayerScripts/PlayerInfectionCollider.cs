@@ -7,8 +7,8 @@ namespace PlayerScripts
     {
         void OnTriggerEnter(Collider other)
         {
-            var thisPlayerRole = NetworkPlayer.GetLocalInstance().Role;
-            if (other.CompareTag("Player") && thisPlayerRole != PlayerRole.Monster && other.GetComponent<NetworkPlayer>().State == PlayerState.InMaze)
+            var thisPlayer = NetworkPlayer.GetLocalInstance();
+            if (other.CompareTag("Player") && thisPlayer.Role != PlayerRole.Monster && thisPlayer.State == PlayerState.InMaze)
             {
                 OnPlayerFound?.Invoke(other);
             }
@@ -16,8 +16,8 @@ namespace PlayerScripts
 
         void OnTriggerExit(Collider other)
         {
-            var otherNetworkPlayer = other.GetComponent<NetworkPlayer>();
-            if (other.CompareTag("Player") && otherNetworkPlayer.Role != PlayerRole.Monster && otherNetworkPlayer.State == PlayerState.InMaze)
+            var thisPlayer = NetworkPlayer.GetLocalInstance();
+            if (other.CompareTag("Player") && thisPlayer.Role != PlayerRole.Monster && thisPlayer.State == PlayerState.InMaze)
             {
                 OnPlayerLost?.Invoke(other);
             }

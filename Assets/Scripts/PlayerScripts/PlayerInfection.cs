@@ -17,16 +17,13 @@ namespace PlayerScripts
         private readonly Stack<Coroutine> _infectingPlayers = new();
         private FixedIntervalFloat _fixedIntervalFloat;
         private PlayerRayCaster _playerRayCaster;
-        
-        
-        public event Action<float> OnInfectionChanged;
 
         public float Value
         {
             get => _fixedIntervalFloat.Value;
             private set
             {
-                _fixedIntervalFloat.Value = Mathf.Clamp(value, 0, maxValue);
+                _fixedIntervalFloat.Value = value;
                 OnInfectionChanged?.Invoke(_fixedIntervalFloat.Value);
             }
         }
@@ -47,10 +44,15 @@ namespace PlayerScripts
 
         private void OnDisable()
         {
+            Value = 0f;
+            
             while (_infectingPlayers.Count > 0)
             {
                 StopCoroutine(_infectingPlayers.Pop());
             }
+            
+            PlayerInfectionCollider.OnPlayerFound -= StartInfecting;
+            PlayerInfectionCollider.OnPlayerLost -= StopInfecting;
         }
 
         private void StartInfecting(Collider other)
@@ -112,5 +114,9 @@ namespace PlayerScripts
 
         public delegate void OnPlayerFullyInfectedDelegate();
         public event OnPlayerFullyInfectedDelegate OnPlayerFullyInfected;
+            
+            
+        public delegate void OnInfectionChangedDelegate(float value);
+        public event OnInfectionChangedDelegate OnInfectionChanged;
     }
 }

@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using ObjectScripts;
+using PlayerScripts.UI;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.InputSystem;
@@ -14,6 +16,7 @@ namespace PlayerScripts
         [SerializeField] private float bareHandDamage;
         [SerializeField] private float attackCooldownSeconds;
         [SerializeField] private float monsterMultiplier;
+        [SerializeField] private float monsterAttackHeal;
         
         [Header("References")]
         [SerializeField] private AudioSource audioSource;
@@ -70,17 +73,21 @@ namespace PlayerScripts
 
                     StartCoroutine(AttackCooldownCoroutine());
 
-                    if(heldObj is Weapon)
+                    if (heldObj is Weapon weapon)
                     {
-                        (heldObj as Usable)?.Use();
+                        weapon.Use();
                     }
                     else
                     {
                         PlaySoundRpc();
                     }
-
-
+                    
                     AttackTargetRpc(otherPlayer.gameObject, attackDamage, RpcTarget.Single(otherPlayer.Id, RpcTargetUse.Temp));
+                    var thisPlayer = GetComponent<NetworkPlayer>();
+                    if (thisPlayer.Role == PlayerRole.Monster)
+                    {
+                        GetComponent<PlayerHealth>().Heal(monsterAttackHeal);
+                    }
                 }
             }
         }

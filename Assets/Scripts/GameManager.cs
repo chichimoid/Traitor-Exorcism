@@ -24,15 +24,18 @@ public class GameManager : NetworkBehaviour
     [SerializeField] private int spectatorLayer;
     
     private readonly NetworkVariable<GamePhase> _phase = new(GamePhase.None);
+
     public GamePhase Phase
     {
-        get => _phase.Value; 
+        get => _phase.Value;
         private set => _phase.Value = value;
     }
     
     public readonly NetworkList<ulong> AlivePlayersIds = new(new List<ulong>());
     
     private readonly NetworkVariable<bool> _isHardcore = new();
+
+    private ulong _monsterId;
 
     public bool IsHardcore
     {
@@ -46,6 +49,7 @@ public class GameManager : NetworkBehaviour
     private Phase2Ender _phase2Ender;
     private Phase3Initializer _phase3Initializer;
     private Phase3Ender _phase3Ender;
+    private SuddenEndPhaseInitializer _suddenEndPhaseInitializer;
     private VotingPhaseInitializer _votingPhaseInitializer;
     private VotingPhaseEnder _votingPhaseEnder;
     private AftermathPhaseInitializer _aftermathPhaseInitializer;
@@ -55,9 +59,18 @@ public class GameManager : NetworkBehaviour
     {
         Instance = this;
     }
+
+    private void Start()
+    {
+        if (!IsServer) return;
+
+        NetworkManager.Singleton.OnClientDisconnectCallback += HandlePlayerDisconnected;
+    }
     
     public void StartGame(bool isHardcore)
     {
+        if (!IsServer) return;
+        
         IsHardcore = isHardcore;
         
         foreach (var id in NetworkManager.ConnectedClientsIds)
@@ -69,26 +82,39 @@ public class GameManager : NetworkBehaviour
         StartMazeScene();
     }
 
+    [Rpc(SendTo.Everyone)]
+    private void SetLoadingScreenRpc(bool show)
+    {
+        if (show) PlayerUI.Instance.LoadingScreenUI.Show();
+        else PlayerUI.Instance.LoadingScreenUI.Hide();
+    }
+    
     private void StartMazeScene()
     {
+        SetLoadingScreenRpc(true);
+        
         SceneLoader.Instance.LoadSceneGlobal(SceneLoader.Scene.Maze);
         ChangePlayerStatesRpc(PlayerState.InMaze);
     }
         
-    public void OnMazeSceneStarted(Phase1Initializer p1Init, Phase1Ender p1End, Phase2Initializer p2Init, Phase2Ender p2End, Phase3Initializer p3Init, Phase3Ender p3End)
+    public void OnMazeSceneStarted(Phase1Initializer p1Init, Phase1Ender p1End, Phase2Initializer p2Init, Phase2Ender p2End, 
+        Phase3Initializer p3Init, Phase3Ender p3End, SuddenEndPhaseInitializer suddenInit)
     {
         if (!IsServer) return;
-            
+        
         _phase1Initializer = p1Init;
         _phase1Ender = p1End;
         _phase2Initializer = p2Init;
         _phase2Ender = p2End;
         _phase3Initializer = p3Init;
         _phase3Ender = p3End;
+        _suddenEndPhaseInitializer = suddenInit;
 
         _phase1Ender.OnPhase1Ended += StartPhase2;
         _phase2Ender.OnPhase2Ended += StartPhase3;
         _phase3Ender.OnPhase3Ended += StartVotingScene;
+        
+        SetLoadingScreenRpc(false);
             
         StartPhase1();
     }
@@ -121,12 +147,14 @@ public class GameManager : NetworkBehaviour
 
         if (Phase != GamePhase.Phase1) throw new Exception($"Phase2 can only start after Phase1. Active phase is {Phase}");
         Phase = GamePhase.Phase2;
-            
+        
         if (_phase2Initializer == null) throw new Exception("Phase initializer not found");
         Debug.Log("Starting phase 2...");
-        _phase2Initializer.Init(out var monsterId);
+        _phase2Initializer.Init(out _monsterId);
+        
+        CheckSuddenEnd();
             
-        _phase2Ender.Subscribe(NetworkPlayer.GetInstance(monsterId).GetComponent<MonsterBar>());
+        _phase2Ender.Subscribe(NetworkPlayer.GetInstance(_monsterId).GetComponent<MonsterBar>());
     }
         
     /// <summary>
@@ -150,8 +178,10 @@ public class GameManager : NetworkBehaviour
         
     private void StartVotingScene()
     {
-        ChangePlayerStatesRpc(PlayerState.InVoting);
+        SetLoadingScreenRpc(true);
+        
         SceneLoader.Instance.LoadSceneGlobal(SceneLoader.Scene.Voting);
+        ChangePlayerStatesRpc(PlayerState.InVoting);
     }
         
     public void OnVotingSceneStarted(VotingPhaseInitializer pVotingInit, VotingPhaseEnder pVotingEnd, AftermathPhaseInitializer pAftermathInit)
@@ -162,6 +192,8 @@ public class GameManager : NetworkBehaviour
         _votingPhaseEnder = pVotingEnd;
         _aftermathPhaseInitializer = pAftermathInit;
         _votingPhaseEnder.OnVotingPhaseEnded += StartAftermathPhase;
+        
+        SetLoadingScreenRpc(false);
             
         StartVotingPhase();
     }
@@ -184,7 +216,7 @@ public class GameManager : NetworkBehaviour
         
         _votingPhaseEnder.Subscribe();
     }
-        
+    
     /// <summary>
     /// The aftermath phase.
     /// Some game over scene etc.
@@ -215,7 +247,7 @@ public class GameManager : NetworkBehaviour
         }
         throw new Exception("No monster found.");
     }
-        
+    
     public static NetworkPlayer GetMonsterNetworkPlayer()
     {
         foreach (var (id, client) in NetworkManager.Singleton.ConnectedClients)
@@ -227,7 +259,7 @@ public class GameManager : NetworkBehaviour
         }
         throw new Exception("No monster found.");
     }
-        
+    
     [Rpc(SendTo.Everyone)]
     private void ChangePlayerStatesRpc(PlayerState state)
     {
@@ -243,10 +275,11 @@ public class GameManager : NetworkBehaviour
         var networkPlayer = NetworkPlayer.GetLocalInstance();
         networkPlayer.State = PlayerState.Dead;
         AlivePlayersIds.Remove(playerId);
-
+        
+        CheckSuddenEnd();
+        
         KillPlayerRpc(playerId);
     }
-    
     
     [Rpc(SendTo.Everyone)]
     private void KillPlayerRpc(ulong playerId)
@@ -262,11 +295,47 @@ public class GameManager : NetworkBehaviour
             networkPlayer.GetComponent<PlayerHealth>().enabled = false;
         
             PlayerLocker.Instance.LockActions();
+            
+            networkPlayer.GetComponent<PlayerInteract>().ForceDrop();
         
             PlayerUI.Instance.EmoteWheelUI.Hide();
             PlayerUI.Instance.EmoteWheelUI.enabled = false;
             PlayerUI.Instance.ReachableObjectDisplayUI.Hide();
             PlayerUI.Instance.ReachableObjectDisplayUI.enabled = false;
         }
+    }
+
+    private void HandlePlayerDisconnected(ulong playerId)
+    {
+        if (!IsServer) return;
+        
+        AlivePlayersIds.Remove(playerId);
+        CheckSuddenEnd();
+    }
+    
+    private void CheckSuddenEnd()
+    {
+        if (AlivePlayersIds.Count == 0)
+        {
+            VerySuddenEndGame();
+        }
+        else if (!AlivePlayersIds.Contains(_monsterId))
+        {
+            SuddenEndGame(true);
+        }
+        else if (AlivePlayersIds.Count == 1)
+        {
+            SuddenEndGame(false);
+        }
+    }
+
+    private void VerySuddenEndGame()
+    {
+        _suddenEndPhaseInitializer.Init(true, ulong.MaxValue);
+    }
+    
+    private void SuddenEndGame(bool survivorsWon)
+    {
+        _suddenEndPhaseInitializer.Init(survivorsWon, _monsterId);
     }
 }

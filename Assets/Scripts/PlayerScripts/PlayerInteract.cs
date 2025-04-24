@@ -115,5 +115,13 @@ namespace PlayerScripts
             }
             _networkPlayer.HeldObjMain = null;
         }
+
+        public void ForceDrop()
+        {
+            _networkPlayer.HeldObjMain?.Drop();
+            _networkPlayer.HeldObjMain = null;
+            _networkPlayer.HeldObjSecond?.Drop();
+            _networkPlayer.HeldObjSecond = null;
+        }
     }
 }

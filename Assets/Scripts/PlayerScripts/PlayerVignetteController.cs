@@ -24,7 +24,6 @@ namespace PlayerScripts
 
             UpdateVignetteHealth(playerHealth.Value);
             UpdateVignetteInfection(playerInfection.Value);
-
         }
 
         private void UpdateVignetteHealth(float currentHealth)

@@ -1278,13 +1278,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  votingCircleCenter: {x: 0, y: 0}
-  votingCircleRadius: 4
-  voteDisplayerLocalSpawnOffset: {x: 0, y: 0, z: 0}
   votingTimeSeconds: 30
   serverTimer: {fileID: 1916518511}
-  voteManagerPrefab: {fileID: 3333724901077375710, guid: da1fa339fb9e07e42893d28f1a12837a, type: 3}
-  voteDisplayerPrefab: {fileID: 7243892097037078832, guid: e9cc97603f959644e94a8c641f8073cc, type: 3}
 --- !u!4 &346573869
 Transform:
   m_ObjectHideFlags: 0
@@ -5351,9 +5346,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
+  votingCircleCenter: {x: 0, y: 0}
+  votingCircleRadius: 4
+  voteDisplayerLocalSpawnOffset: {x: 0, y: 0, z: 0}
   votingPhaseInitializer: {fileID: 346573868}
   votingPhaseEnder: {fileID: 1484929237}
   aftermathPhaseInitializer: {fileID: 639002909}
+  voteManagerPrefab: {fileID: 3333724901077375710, guid: da1fa339fb9e07e42893d28f1a12837a, type: 3}
+  voteDisplayerPrefab: {fileID: 7243892097037078832, guid: e9cc97603f959644e94a8c641f8073cc, type: 3}
 --- !u!4 &2014489343
 Transform:
   m_ObjectHideFlags: 0

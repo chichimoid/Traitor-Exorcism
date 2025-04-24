@@ -15,7 +15,7 @@ namespace Maze.GameCycle
         {
             OnPhase3Ended?.Invoke();
         }
-
+        
         public delegate void OnPhase3EndedDelegate();
         public event OnPhase3EndedDelegate OnPhase3Ended;
     }

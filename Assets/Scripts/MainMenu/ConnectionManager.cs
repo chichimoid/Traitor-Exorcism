@@ -43,6 +43,7 @@ namespace MainMenu
             var relayServerData = AllocationUtils.ToRelayServerData(clientAllocation, "dtls");
         
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
+            
             NetworkManager.Singleton.StartClient();
         }
     }

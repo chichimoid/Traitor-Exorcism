@@ -1,6 +1,9 @@
-﻿using Maze.GameCycle;
+﻿using System.Security.Cryptography;
+using Maze.GameCycle;
 using PlayerScripts;
+using PlayerScripts.UI;
 using Unity.Netcode;
+using Unity.Services.Relay;
 using UnityEngine;
 
 namespace Maze
@@ -17,6 +20,7 @@ namespace Maze
         [SerializeField] private Phase2Ender phase2Ender;
         [SerializeField] private Phase3Initializer phase3Initializer;
         [SerializeField] private Phase3Ender phase3Ender;
+        [SerializeField] private SuddenEndPhaseInitializer suddenEndPhaseInitializer;
 
         [Header("Prefabs")]
         [SerializeField] private Transform mazeSpawnerPrefab;
@@ -45,6 +49,7 @@ namespace Maze
             if (_spawnedPlayers.Value == NetworkManager.Singleton.ConnectedClients.Count)
             {
                 InitScene();
+                Destroy(gameObject);
             }
         }
         
@@ -60,7 +65,8 @@ namespace Maze
             spawnedObj.GetComponent<NetworkObject>().Spawn(true);
             spawnedObj.GetComponent<MazeSpawner>().SpawnMaze(_mazeData.Value);
             
-            GameManager.Instance.OnMazeSceneStarted(phase1Initializer, phase1Ender, phase2Initializer, phase2Ender, phase3Initializer, phase3Ender);
+            GameManager.Instance.OnMazeSceneStarted(phase1Initializer, phase1Ender, phase2Initializer, phase2Ender, 
+                phase3Initializer, phase3Ender, suddenEndPhaseInitializer);
             
             FinishInitSceneRpc();
         }

@@ -30,6 +30,11 @@ namespace PlayerScripts
             
             if (!IsOwner) return;
             
+            if (GameManager.Instance != null && GameManager.Instance.Phase != GamePhase.None)
+            {
+                NetworkManager.Singleton.Shutdown();
+            }
+            
             Debug.Log($"Spawned player (id: {NetworkManager.Singleton.LocalClientId})");
             
             Cursor.visible = false;

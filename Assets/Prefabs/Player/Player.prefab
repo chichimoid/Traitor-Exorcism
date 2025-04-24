@@ -520,6 +520,8 @@ MonoBehaviour:
   regenTick: 0.5
   regenDelay: 3
   regenValue: 1
+  monsterDrainTick: 0.5
+  monsterDrainValue: 1
 --- !u!114 &5167530342270831739
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -601,7 +603,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  maxValue: 30
+  maxValue: 60
   fillingTick: 1
   fillingValue: 1
 --- !u!114 &5078071764432592721
@@ -650,6 +652,7 @@ MonoBehaviour:
   bareHandDamage: 3
   attackCooldownSeconds: 0.5
   monsterMultiplier: 7
+  monsterAttackHeal: 20
   audioSource: {fileID: 6680843398267331101}
 --- !u!114 &2062729248973738123
 MonoBehaviour:
@@ -1163,7 +1166,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 3.5
+  m_Radius: 6
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &3549548044490775065
 MonoBehaviour:

@@ -39,7 +39,9 @@ namespace Maze.GameCycle
         [Rpc(SendTo.SpecifiedInParams)]
         private void InitMonsterTargetRpc(RpcParams rpcParams)
         {
-            NetworkPlayer.GetLocalInstance().GetComponent<MonsterBar>().StartFilling();
+            var networkPlayer = NetworkPlayer.GetLocalInstance();
+            networkPlayer.GetComponent<MonsterBar>().StartFilling();
+            //networkPlayer.GetComponent<PlayerHealth>().StartMonsterHealthDrain();
         }
 
         [Rpc(SendTo.Everyone)]

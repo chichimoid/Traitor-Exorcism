@@ -12,21 +12,22 @@ namespace PlayerScripts
         [SerializeField] private float regenTick = 0.5f;
         [SerializeField] private float regenDelay = 3f;
         [SerializeField] private float regenValue = 1f;
+        [SerializeField] private float monsterDrainTick = 0.5f;
+        [SerializeField] private float monsterDrainValue = 1f;
         
         private FixedIntervalFloat _fixedIntervalFloat;
         private Coroutine _regenAfterDelayCoroutine;
+        private Coroutine _monsterHealthDrainCoroutine;
 
         private bool _isDead = false;
-
-        public event Action<float> OnHealthChanged;
 
         public float Value
         {
             get => _fixedIntervalFloat.Value;
             private set
             {
-                _fixedIntervalFloat.Value = Mathf.Clamp(value, 0, maxValue);
-                OnHealthChanged?.Invoke(_fixedIntervalFloat.Value);
+                _fixedIntervalFloat.Value = value;
+                OnHealthChanged?.Invoke(value);
             }
         }
 
@@ -42,14 +43,21 @@ namespace PlayerScripts
 
         private void OnDisable()
         {
+            Value = maxValue;
+            
             if (_regenAfterDelayCoroutine != null)
             {
                 StopCoroutine(_regenAfterDelayCoroutine);
             }
+
+            if (_monsterHealthDrainCoroutine != null)
+            {
+                StopCoroutine(_monsterHealthDrainCoroutine);
+            }
         }
         
         /// <param name="value">positive</param>
-        public void Regen(float value)
+        public void Heal(float value)
         {
             if (!IsOwner || _isDead) return;
             
@@ -76,7 +84,20 @@ namespace PlayerScripts
             CheckDead();
             if (_isDead) return;
             
-            _regenAfterDelayCoroutine = StartCoroutine(RegenAfterDelayCoroutine());
+            if (_monsterHealthDrainCoroutine == null) _regenAfterDelayCoroutine = StartCoroutine(RegenAfterDelayCoroutine());
+        }
+
+        public void StartMonsterHealthDrain()
+        {
+            _monsterHealthDrainCoroutine = StartCoroutine(MonsterHealthDrainCoroutine());
+        }
+        private IEnumerator MonsterHealthDrainCoroutine()
+        {
+            while (Value > 0)
+            {
+                Damage(monsterDrainValue);
+                yield return new WaitForSeconds(monsterDrainTick);
+            }
         }
         
         private IEnumerator RegenAfterDelayCoroutine()
@@ -85,7 +106,7 @@ namespace PlayerScripts
 
             while (Value < maxValue)
             {
-                Regen(regenValue);
+                Heal(regenValue);
                 yield return new WaitForSeconds(regenTick);
             }
         }
@@ -100,6 +121,9 @@ namespace PlayerScripts
             }
         }
 
+        public delegate void OnHealthChangedDelegate(float value);
+        public event OnHealthChangedDelegate OnHealthChanged;
+        
         public delegate void OnHealthZeroDelegate();
         public event OnHealthZeroDelegate OnHealthZero;
 

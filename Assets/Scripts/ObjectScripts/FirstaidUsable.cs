@@ -20,7 +20,7 @@ namespace ObjectScripts
                 Debug.Log("You have a full health!");
                 return;
             }
-            Player.GetComponent<PlayerHealth>().Regen(20);
+            Player.GetComponent<PlayerHealth>().Heal(20);
             _count--;
             if (_count == 0) audioSource.clip = emptySound;
             Debug.Log($"Current health: {Player.GetComponent<PlayerHealth>().Value}. Uses left: {_count}");

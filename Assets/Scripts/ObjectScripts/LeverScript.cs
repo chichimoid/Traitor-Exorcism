@@ -37,8 +37,7 @@ namespace ObjectScripts
         
         private void LeverActionSound()
         {
-            _isUp = !_isUp;
-            StartCoroutine(RotateLever());
+            LeverAction();
             audioSource.Stop();
         }
         
